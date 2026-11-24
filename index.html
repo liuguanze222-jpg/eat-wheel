@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>东方食堂转盘 · 今天吃什么</title>
+<style>
+/* 全部硬编码：无 var、无 oklch、无 grid、无 aspect-ratio、无 clamp —— X5 兜底 */
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:#f4f6f4; color:#1c2620; font-family:PingFang SC,Hiragino Sans GB,Microsoft YaHei,system-ui,sans-serif; }
+.wrap { max-width:640px; margin:0 auto; padding:16px 16px 40px; }
+h1 { font-size:22px; font-weight:600; color:#14231a; letter-spacing:-0.02em; }
+.sub { font-size:13px; color:#6b7670; margin-top:4px; line-height:1.5; }
+.src { font-size:11px; color:#8a948d; margin-top:8px; }
+.topbtns { margin-top:10px; }
+.tbtn { display:inline-block; border:1px solid #d5ddd6; background:#fff; color:#2a3a30;
+        font-size:12px; padding:6px 12px; border-radius:16px; margin-right:8px; }
+.stage { text-align:center; margin-top:18px; }
+.wheelbox { position:relative; width:300px; height:300px; margin:0 auto; }
+#rotor { position:absolute; left:0; top:0; width:300px; height:300px;
+         transition:transform 5s cubic-bezier(0.12,0.8,0.08,1); }
+.pointer { position:absolute; top:-8px; left:50%; margin-left:-11px; width:22px; height:26px; z-index:3; }
+#hub { position:absolute; top:118px; left:118px; width:64px; height:64px; border-radius:50%;
+       background:#ffffff; border:1px solid #dfe5e0; color:#14231a; font-size:20px; font-weight:600;
+       cursor:pointer; z-index:2; }
+#hub:disabled { color:#98a29b; }
+.result { margin-top:18px; background:#ffffff; border:1px solid #e6eae6; border-radius:14px;
+          padding:14px 16px; text-align:left; min-height:20px; }
+.rrow { display:flex; align-items:center; }
+.rimg { width:52px; height:52px; border-radius:10px; margin-right:12px; background:#eef1ee; }
+.rname { font-size:16px; font-weight:600; color:#14231a; }
+.rmeta { font-size:12px; color:#6b7670; margin-top:3px; }
+.rbtns { margin-top:10px; }
+.go { display:inline-block; background:#17b04b; color:#ffffff !important; font-size:13px;
+      padding:8px 16px; border-radius:8px; text-decoration:none; margin-right:8px; }
+.again { display:inline-block; border:1px solid #d5ddd6; color:#2a3a30; font-size:13px;
+         padding:8px 14px; border-radius:8px; background:#fff; }
+.sec { margin-top:22px; font-size:15px; font-weight:600; color:#14231a; }
+.count { font-size:11px; color:#8a948d; font-weight:normal; margin-left:6px; }
+.addrow { margin-top:10px; display:flex; }
+.addrow input { flex:1; border:1px solid #d5ddd6; border-radius:8px; padding:9px 10px;
+                font-size:13px; color:#1c2620; background:#fff; }
+.addbtn { border:0; background:#17b04b; color:#fff; font-size:13px; padding:0 16px;
+          border-radius:8px; margin-left:8px; }
+.list { margin-top:10px; }
+.row { display:flex; align-items:center; background:#fff; border:1px solid #e6eae6;
+       border-radius:10px; padding:10px; margin-bottom:8px; }
+.row img { width:40px; height:40px; border-radius:8px; margin:0 10px; background:#eef1ee; }
+.rinfo { flex:1; min-width:0; }
+.rn { font-size:14px; color:#1c2620; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.rm { font-size:11px; color:#8a948d; margin-top:2px; }
+.row input[type=checkbox] { width:18px; height:18px; }
+.hist { margin-top:10px; }
+.chip { display:inline-block; background:#fff; border:1px solid #e6eae6; border-radius:12px;
+        font-size:11px; color:#5a6660; padding:4px 10px; margin:0 6px 6px 0; }
+.chip b { color:#1c2620; font-weight:600; }
+.empty { margin-top:16px; background:#fff; border:1px solid #e6eae6; border-radius:14px;
+         padding:26px; text-align:center; color:#8a948d; font-size:13px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>今天吃什么</h1>
+  <div class="sub">河北东方学院订餐平台 · 转到哪家吃哪家，点「去点单」直达店铺菜单</div>
+  <div class="src" id="src">正在拉取店铺…</div>
+  <div class="topbtns">
+    <a class="tbtn" href="javascript:void(0)" id="refresh">重新拉取</a>
+    <a class="tbtn" href="javascript:void(0)" id="copybtn">复制链接</a>
+  </div>
+
+  <div class="stage">
+    <div class="wheelbox">
+      <div id="rotor"><svg id="svg" width="300" height="300" viewBox="0 0 300 300"></svg></div>
+      <svg class="pointer" viewBox="0 0 22 26"><path d="M11 25 1 2h20L11 25Z" fill="#17b04b"/></svg>
+      <button id="hub" type="button">转</button>
+    </div>
+    <div class="result" id="result" style="display:none">
+      <div class="rrow">
+        <img class="rimg" id="rimg" alt="">
+        <div style="min-width:0">
+          <div class="rname" id="rname"></div>
+          <div class="rmeta" id="rmeta"></div>
+        </div>
+      </div>
+      <div class="rbtns">
+        <a class="go" id="go" href="#">去点单</a>
+        <a class="again" href="javascript:void(0)" id="again">再来一次</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec">参与转盘的店铺 <span class="count" id="cnt"></span></div>
+  <div class="addrow">
+    <input id="addinput" type="text" maxlength="30" placeholder="手动加一家店（食堂窗口名）">
+    <button class="addbtn" id="addbtn" type="button">添加</button>
+  </div>
+  <div class="list" id="list"></div>
+
+  <div class="sec">最近转到</div>
+  <div class="hist" id="hist"></div>
+</div>
+
+<script>
+var API = 'https://waimai.xyan.cn';
+var H5  = 'https://waimai.xyan.cn/user/#/pages/index/index';
+var TENANTS = [
+  { appid:'hbdfxy',  site:'128052', name:'河北东方学院订餐平台' },
+  { appid:'hbdfxycs', site:'0',      name:'河北东方学院-超市外卖' }
+];
+var SNAPSHOT = [
+  { shop_id: 223, shop_name: "锅盔大锅菜了辛爆汁烤冷面D", shop_logo: "https://s.haohuoshi.net/uploads/images/20240315/7bf77a2e8961ecc9bbd5093250236b623843bc11.jpg", score: "", month_sum: "", expected_delivery: "预计10分钟后送达", appid: 'hbdfxy', site: '128052', source: '快照' },
+  { shop_id: 242, shop_name: "校园自选快餐D", shop_logo: "https://s.haohuoshi.net/uploads/images/20250825/78100d7620e39d263a06519923304d0ba2c0dc16.jpg", score: "", month_sum: "", expected_delivery: "预计10分钟后送达", appid: 'hbdfxy', site: '128052', source: '快照' },
+  { shop_id: 297, shop_name: "东区老同学汉堡 面条 米饭 米粉D", shop_logo: "https://s.haohuoshi.net/uploads/images/20250314/c0f3bb0d786a614f4dbe04ee1d75092947a5f1c0.jpg", score: "", month_sum: "", expected_delivery: "预计10分钟后送达", appid: 'hbdfxy', site: '128052', source: '快照' },
+  { shop_id: 305, shop_name: "鸡汤馄饨.面水饺D", shop_logo: "https://s.haohuoshi.net/uploads/images/20250829/8ec7ca76fa127707e7f490c0ffebbcd04fcbe27c.jpg", score: "", month_sum: "", expected_delivery: "预计10分钟后送达", appid: 'hbdfxy', site: '128052', source: '快照' },
+  { shop_id: 221, shop_name: "粥·炒馅大包子6元套餐D", shop_logo: "https://s.haohuoshi.net/uploads/images/20260902/9d29f49ab5f10d8eeaa7c71c32f8a2741d8566bf.jpeg", score: "", month_sum: "", expected_delivery: "预计10分钟后送达", appid: 'hbdfxy', site: '128052', source: '快照' },
+  { shop_id: 224, shop_name: "老赵炒饼炒饭炒面烤冷面手抓饼灌饼D", shop_logo: "https://s.haohuoshi.net/uploads/images/20241026/91982dff5fde7cf52d1ce21c45033d9bc489545c.jpg", score: "", month_sum: "", expected_delivery: "预计10分钟后送达", appid: 'hbdfxy', site: '128052', source: '快照' },
+  { shop_id: 243, shop_name: "水饺重庆小面米线D", shop_logo: "https://s.haohuoshi.net/uploads/images/20261113/b564c2a1c0813a949dc5e5e486d5d3bdb672cb75.jpg", score: "", month_sum: "", expected_delivery: "预计10分钟后送达", appid: 'hbdfxy', site: '128052', source: '快照' },
+  { shop_id: 298, shop_name: "杭州小笼包，山东大煎饼D", shop_logo: "https://s.haohuoshi.net/uploads/images/20250826/dd3f8a7555c324cb846822334aa43511068fed90.jpg", score: "", month_sum: "", expected_delivery: "预计10分钟后送达", appid: 'hbdfxy', site: '128052', source: '快照' },
+  { shop_id: 310, shop_name: "家味水饺 馄饨D", shop_logo: "https://s.haohuoshi.net/uploads/images/20260312/a269118ba004e3a14c920e7201ca70b9e8f1b2f3.png", score: "", month_sum: "", expected_delivery: "预计10分钟后送达", appid: 'hbdfxy', site: '128052', source: '快照' },
+  { shop_id: 295, shop_name: "干锅米饭，状元鸡，滑蛋饭，烧烤鸭饭，猪肘饭D", shop_logo: "https://s.haohuoshi.net/uploads/images/20260529/eff42940362dc41344d33c3f82a1b74733ed3c6f.jpg", score: "", month_sum: "", expected_delivery: "预计10分钟后送达", appid: 'hbdfxy', site: '128052', source: '快照' },
+];
+
+var shops = [], enabled = {}, rotation = 0, spinning = false, history = [];
+
+function esc(s){ return String(s==null?'':s).replace(/[<>&"']/g,function(c){
+  return {'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&#39;'}[c]; }); }
+function key(s){ return String(s.shop_id != null ? s.shop_id : s.shop_name); }
+function pool(){ var a=[]; for(var i=0;i<shops.length;i++){ if(enabled[key(shops[i])]) a.push(shops[i]); } return a; }
+
+/* ---------- 本地存储 ---------- */
+function loadLocal(){
+  try{
+    var raw = localStorage.getItem('xw2-shops');
+    if(raw){ var d = JSON.parse(raw);
+      if(d.shops && d.shops.length){ shops = d.shops; enabled = d.enabled||{};
+        for(var i=0;i<shops.length;i++){ if(!(key(shops[i]) in enabled)) enabled[key(shops[i])]=1; }
+        setSrc('本地缓存 · 点「重新拉取」更新'); return true; } }
+    var h = localStorage.getItem('xw2-hist');
+    if(h) history = JSON.parse(h);
+  }catch(e){}
+  return false;
+}
+function saveLocal(){
+  try{ localStorage.setItem('xw2-shops', JSON.stringify({shops:shops,enabled:enabled}));
+       localStorage.setItem('xw2-hist', JSON.stringify(history.slice(0,12))); }catch(e){}
+}
+
+/* ---------- 拉数据 ---------- */
+function fetchTenant(t, cb){
+  var x = new XMLHttpRequest();
+  x.open('POST', API + '/user/index/aloneDistribution', true);
+  x.setRequestHeader('Content-Type','application/x-www-form-urlencoded; charset=UTF-8');
+  x.setRequestHeader('appid', t.appid);
+  x.onload = function(){
+    try{
+      var j = JSON.parse(x.responseText);
+      if(j.code === 1 && j.data && j.data.shop_array && j.data.shop_array.data){
+        var rows = j.data.shop_array.data, out = [];
+        for(var i=0;i<rows.length;i++){
+          rows[i].source = t.name; rows[i].appid = t.appid; rows[i].site = t.site;
+          out.push(rows[i]);
+        }
+        cb(null, out);
+      } else cb(new Error(j.msg||'接口异常'));
+    }catch(e){ cb(e); }
+  };
+  x.onerror = function(){ cb(new Error('网络错误')); };
+  x.send('page=1');
+}
+function loadRemote(cb){
+  var left = TENANTS.length, out = [], fails = [];
+  for(var i=0;i<TENANTS.length;i++){
+    (function(t){
+      fetchTenant(t, function(err, rows){
+        if(err) fails.push(t.name); else out = out.concat(rows);
+        if(--left === 0){
+          // 去重
+          var seen = {}, uniq = [];
+          for(var k=0;k<out.length;k++){ var kk=key(out[k]); if(!seen[kk]){ seen[kk]=1; uniq.push(out[k]); } }
+          cb(uniq.length ? null : new Error(fails.join(',')+' 拉取失败'), uniq, fails);
+        }
+      });
+    })(TENANTS[i]);
+  }
+}
+function setSrc(t){ document.getElementById('src').innerHTML = esc(t); }
+
+function boot(force){
+  document.getElementById('result').style.display='none';
+  if(!force && loadLocal()){ renderList(); drawWheel(); resetRot(); return; }
+  setSrc('正在拉取店铺…');
+  loadRemote(function(err, rows, fails){
+    if(err){
+      shops = SNAPSHOT.slice(); enabled = {};
+      for(var i=0;i<shops.length;i++) enabled[key(shops[i])]=1;
+      setSrc('接口不通，已用本地快照');
+    } else {
+      shops = rows; enabled = {};
+      for(var j=0;j<shops.length;j++) enabled[key(shops[j])]=1;
+      setSrc('实时拉取 ' + shops.length + ' 家' + (fails&&fails.length? '（'+fails.join(',')+'失败）':''));
+    }
+    saveLocal(); renderList(); drawWheel(); resetRot();
+  });
+}
+
+/* ---------- 转盘绘制（属性级样式，无 CSS 依赖） ---------- */
+var CX=150, CY=150, R=140;
+function polar(r,deg){ var rad=(deg-90)*Math.PI/180; return [CX+r*Math.cos(rad), CY+r*Math.sin(rad)]; }
+function trunc(s,n){ s=String(s||'').trim(); return s.length>n? s.slice(0,n)+'…' : s; }
+
+function drawWheel(){
+  var p = pool(), n = p.length, parts = [];
+  parts.push('<circle cx="150" cy="150" r="140" fill="#ffffff" stroke="#e2e7e3"/>');
+  if(!n){ document.getElementById('svg').innerHTML = parts.join(''); return; }
+  var seg = 360/n;
+  for(var i=0;i<n;i++){
+    var a0=i*seg, a1=a0+seg;
+    var fill = (i%2===0)? '#e8f6ec' : '#ffffff';
+    var p0=polar(R,a0), p1=polar(R,a1);
+    var large = (a1-a0)>180?1:0;
+    parts.push('<path d="M150 150 L'+p0[0].toFixed(1)+' '+p0[1].toFixed(1)+
+      ' A140 140 0 '+large+' 1 '+p1[0].toFixed(1)+' '+p1[1].toFixed(1)+
+      ' Z" fill="'+fill+'" stroke="#e2e7e3"/>');
+    var mid=a0+seg/2, tp=polar(R*0.63,mid);
+    var rot=mid+90; if(rot>90&&rot<270) rot-=180;
+    var fs = n>8?12:13;
+    parts.push('<text x="'+tp[0].toFixed(1)+'" y="'+tp[1].toFixed(1)+
+      '" text-anchor="middle" dominant-baseline="middle" fill="#1a2e22" '+
+      'font-family="PingFang SC,Microsoft YaHei,sans-serif" font-size="'+fs+
+      '" transform="rotate('+rot.toFixed(1)+' '+tp[0].toFixed(1)+' '+tp[1].toFixed(1)+')">'+
+      esc(trunc(p[i].shop_name, n>8?5:7)) + '</text>');
+  }
+  parts.push('<circle cx="150" cy="150" r="56" fill="#ffffff" stroke="#eef1ee"/>');
+  document.getElementById('svg').innerHTML = parts.join('');
+}
+
+/* ---------- 转动 ---------- */
+var token = 0;
+function spin(){
+  if(spinning) return;
+  var p = pool();
+  if(p.length < 2){ alert('至少勾选两家店再转'); return; }
+  spinning = true;
+  var hub = document.getElementById('hub');
+  hub.disabled = true; hub.innerHTML = '…';
+  document.getElementById('result').style.display='none';
+
+  var seg = 360/p.length;
+  var idx = Math.floor(Math.random()*p.length);
+  var jitter = (Math.random()-0.5)*seg*0.7;
+  var target = (360 - ((idx+0.5)*seg + jitter)%360 + 360)%360;
+  var cur = ((rotation%360)+360)%360;
+  rotation += 360*5 + ((target-cur+360)%360);
+
+  var rotor = document.getElementById('rotor');
+  rotor.style.transform = 'rotate('+rotation+'deg)';
+  var my = ++token;
+  var done = function(){ if(my!==token) return; token=-1;
+    spinning=false; hub.disabled=false; hub.innerHTML='转';
+    showResult(p[idx]); pushHist(p[idx]); };
+  var fired = false;
+  rotor.addEventListener('transitionend', function(){
+    if(fired) return; fired=true; setTimeout(done, 60);
+  });
+  setTimeout(function(){ if(fired) return; fired=true; done(); }, 5300);
+}
+
+function showResult(s){
+  document.getElementById('rname').textContent = s.shop_name;
+  var img = document.getElementById('rimg');
+  if(s.shop_logo){ img.src = s.shop_logo; img.style.display='block'; } else img.style.display='none';
+  var meta = [];
+  if(s.score) meta.push('评分 '+s.score);
+  if(s.month_sum) meta.push('月售 '+s.month_sum);
+  if(s.expected_delivery) meta.push(s.expected_delivery);
+  document.getElementById('rmeta').textContent = meta.join(' · ');
+  var appid = s.appid||'hbdfxy', site = s.site||'128052';
+  document.getElementById('go').href = H5 + '?a=' + appid + '_' + site + '_' + encodeURIComponent(s.shop_id);
+  document.getElementById('result').style.display='block';
+}
+function pushHist(s){
+  history.unshift({ name:s.shop_name, at:Date.now() });
+  history = history.slice(0,12); saveLocal(); renderHist();
+}
+
+/* ---------- 列表 / 历史 ---------- */
+function renderList(){
+  var p = pool();
+  document.getElementById('cnt').textContent = p.length + ' / ' + shops.length + ' 家';
+  var html = '';
+  for(var i=0;i<shops.length;i++){
+    var s = shops[i], k = key(s), on = !!enabled[k];
+    html += '<div class="row">'
+      + '<input type="checkbox" data-k="'+esc(k)+'"'+(on?' checked':'')+'>'
+      + (s.shop_logo? '<img src="'+esc(s.shop_logo)+'" alt="">':'')
+      + '<div class="rinfo"><div class="rn">'+esc(s.shop_name)+'</div>'
+      + '<div class="rm">'+esc(s.source||'')+'</div></div></div>';
+  }
+  var list = document.getElementById('list');
+  list.innerHTML = html;
+  var cbs = list.getElementsByTagName('input');
+  for(var j=0;j<cbs.length;j++){
+    cbs[j].onchange = function(){
+      if(this.checked) enabled[this.getAttribute('data-k')]=1;
+      else delete enabled[this.getAttribute('data-k')];
+      saveLocal(); renderList(); drawWheel(); resetRot();
+    };
+  }
+}
+function renderHist(){
+  var h = '';
+  if(!history.length) h = '<span class="chip">还没有转过</span>';
+  for(var i=0;i<history.length;i++){
+    var d = new Date(history[i].at);
+    var hm = (d.getHours()<10?'0':'')+d.getHours()+':'+(d.getMinutes()<10?'0':'')+d.getMinutes();
+    var nm = history[i].name.length>8? history[i].name.slice(0,8)+'…' : history[i].name;
+    h += '<span class="chip"><b>'+esc(nm)+'</b> '+hm+'</span>';
+  }
+  document.getElementById('hist').innerHTML = h;
+}
+function resetRot(){
+  var r = document.getElementById('rotor');
+  r.style.transition = 'none'; rotation = 0;
+  r.style.transform = 'rotate(0deg)';
+  void r.offsetWidth; r.style.transition = '';
+}
+
+/* ---------- 事件 ---------- */
+document.getElementById('hub').onclick = spin;
+document.getElementById('again').onclick = spin;
+document.getElementById('refresh').onclick = function(){ boot(true); };
+document.getElementById('copybtn').onclick = function(){
+  var u = location.href.split('?')[0];
+  if(navigator.clipboard){ navigator.clipboard.writeText(u); toast('链接已复制'); }
+  else toast('地址栏复制：'+u);
+};
+document.getElementById('addbtn').onclick = addShop;
+document.getElementById('addinput').onkeydown = function(e){ if(e.key==='Enter') addShop(); };
+function addShop(){
+  var inp = document.getElementById('addinput'), name = inp.value.replace(/^\s+|\s+$/g,'');
+  if(!name){ return; }
+  var s = { shop_id:'m'+Date.now(), shop_name:name, source:'手动', appid:'hbdfxy', site:'128052' };
+  shops.push(s); enabled[key(s)]=1; inp.value='';
+  saveLocal(); renderList(); drawWheel(); resetRot();
+}
+function toast(msg){
+  var d = document.createElement('div');
+  d.style.cssText='position:fixed;left:50%;bottom:30px;transform:translateX(-50%);background:#2a3a30;color:#fff;font-size:13px;padding:8px 16px;border-radius:16px;z-index:99';
+  d.textContent = msg; document.body.appendChild(d);
+  setTimeout(function(){ document.body.removeChild(d); }, 1600);
+}
+
+boot(false);
+</script>
+</body>
+</html>

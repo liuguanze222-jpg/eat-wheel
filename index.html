@@ -146,7 +146,7 @@ h1 { font-size:22px; font-weight:600; color:#14231a; letter-spacing:-0.02em; }
 
 <script>
 var API='https://waimai.xyan.cn';
-var H5='https://waimai.xyan.cn/user/#/pages/index/index';
+var SHOP_URL='https://waimai.xyan.cn/user/#/pages/index/shopHome?id=';   // 直达店铺页（需已登录过站点）
 var TENANT={appid:'hbdfxy', site:'128052'};
 
 var CAT_SHADES=['#e6f2ea','#ffffff','#dcefe3','#f4f9f5','#e9f4ec','#fbfdfc','#d5e9dd','#eef7f1','#e1f0e7','#ffffff'];
@@ -565,7 +565,7 @@ function renderResult(){
   document.getElementById('rpick').textContent = picked.dish? ('吃：'+picked.dish) : '';
   var go=document.getElementById('go');
   if(shop){
-    go.href=H5+'?a='+(shop.appid||TENANT.appid)+'_'+(shop.site||TENANT.site)+'_'+encodeURIComponent(shop.shop_id);
+    go.href=SHOP_URL+encodeURIComponent(shop.shop_id);
     go.style.display='inline-block';
   }else{
     go.style.display='none';

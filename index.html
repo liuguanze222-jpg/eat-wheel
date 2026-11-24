@@ -7,25 +7,35 @@
 <style>
 * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
 body { background:#f4f6f4; color:#1c2620; font-family:PingFang SC,Hiragino Sans GB,Microsoft YaHei,system-ui,sans-serif; }
-.wrap { max-width:640px; margin:0 auto; padding:16px 16px 40px; }
+.wrap { max-width:680px; margin:0 auto; padding:16px 16px 40px; }
 h1 { font-size:22px; font-weight:600; color:#14231a; letter-spacing:-0.02em; }
 .sub { font-size:13px; color:#6b7670; margin-top:4px; line-height:1.5; }
 .src { font-size:11px; color:#8a948d; margin-top:8px; }
 .topbtns { margin-top:10px; }
 .tbtn { display:inline-block; border:1px solid #d5ddd6; background:#fff; color:#2a3a30;
         font-size:12px; padding:6px 12px; border-radius:16px; margin:0 8px 8px 0; }
-.stage { text-align:center; margin-top:16px; }
-.wheelbox { position:relative; width:300px; height:300px; margin:0 auto; }
-#rotor { position:absolute; left:0; top:0; width:300px; height:300px;
+
+/* 图例 chips */
+.cates { margin-top:12px; display:flex; flex-wrap:wrap; gap:6px; }
+.cchip { display:inline-flex; align-items:center; gap:5px; font-size:11px; color:#3f4c45;
+         background:#fff; border:1px solid #e2e7e3; border-radius:14px; padding:4px 9px; cursor:pointer; }
+.cchip.on { border-color:#17b04b; color:#0f7a35; background:#f2fbf5; }
+.cdot { width:8px; height:8px; border-radius:2px; flex:none; }
+.cnum { color:#98a29b; font-variant-numeric:tabular-nums; }
+
+.stage { text-align:center; margin-top:14px; }
+.wheelbox { position:relative; width:min(340px,84vw); aspect-ratio:1/1; margin:0 auto; }
+#rotor { position:absolute; left:0; top:0; width:100%; height:100%;
          transition:transform 5s cubic-bezier(0.12,0.8,0.08,1); }
-.pointer { position:absolute; top:-8px; left:50%; margin-left:-11px; width:22px; height:26px; z-index:3; }
-#hub { position:absolute; top:118px; left:118px; width:64px; height:64px; border-radius:50%;
-       background:#fff; border:1px solid #dfe5e0; color:#14231a; font-size:20px; font-weight:600;
-       cursor:pointer; z-index:2; }
+.pointer { position:absolute; top:-9px; left:50%; margin-left:-11px; width:22px; height:27px; z-index:3; }
+#hub { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:68px; height:68px; border-radius:50%;
+       background:#fff; border:1px solid #dfe5e0; color:#14231a; font-size:21px; font-weight:600;
+       cursor:pointer; z-index:2; box-shadow:0 2px 8px rgba(20,40,28,.10); }
 #hub:disabled { color:#98a29b; }
-.poolinfo { font-size:11px; color:#8a948d; margin-top:10px; }
-.result { margin-top:16px; background:#fff; border:1px solid #e6eae6; border-radius:14px;
-          padding:14px 16px; text-align:left; }
+.poolinfo { font-size:11px; color:#8a948d; margin-top:10px; line-height:1.6; }
+
+.result { margin-top:14px; background:#fff; border:1px solid #e6eae6; border-radius:14px;
+          padding:14px 16px; text-align:left; box-shadow:0 2px 10px rgba(20,40,28,.05); }
 .rrow { display:flex; align-items:center; }
 .rimg { width:52px; height:52px; border-radius:10px; margin-right:12px; background:#eef1ee; flex:none; }
 .rname { font-size:16px; font-weight:600; color:#14231a; line-height:1.35; }
@@ -35,6 +45,7 @@ h1 { font-size:22px; font-weight:600; color:#14231a; letter-spacing:-0.02em; }
       border-radius:8px; text-decoration:none; margin-right:8px; }
 .again { display:inline-block; border:1px solid #d5ddd6; color:#2a3a30; font-size:13px;
          padding:8px 14px; border-radius:8px; background:#fff; }
+
 .sec { margin-top:22px; font-size:15px; font-weight:600; color:#14231a; }
 .count { font-size:11px; color:#8a948d; font-weight:normal; margin-left:6px; }
 .searchrow { margin-top:10px; display:flex; gap:8px; }
@@ -42,19 +53,20 @@ h1 { font-size:22px; font-weight:600; color:#14231a; letter-spacing:-0.02em; }
                    padding:9px 10px; font-size:13px; color:#1c2620; background:#fff; }
 .minibtn { border:1px solid #d5ddd6; background:#fff; color:#2a3a30; font-size:12px;
            padding:0 12px; border-radius:8px; }
-.list { margin-top:10px; max-height:420px; overflow-y:auto; -webkit-overflow-scrolling:touch; }
+.list { margin-top:10px; max-height:460px; overflow-y:auto; -webkit-overflow-scrolling:touch; }
 .row { display:flex; align-items:center; background:#fff; border:1px solid #e6eae6;
        border-radius:10px; padding:9px 10px; margin-bottom:7px; }
-.row img { width:36px; height:36px; border-radius:8px; margin:0 9px; background:#eef1ee; flex:none; }
+.row img { width:36px; height:36px; border-radius:8px; margin-right:9px; background:#eef1ee; flex:none; }
 .rinfo { flex:1; min-width:0; }
 .rn { font-size:13px; color:#1c2620; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.rm { font-size:10px; color:#8a948d; margin-top:2px; }
+.rm { font-size:10px; color:#8a948d; margin-top:2px; display:flex; align-items:center; gap:5px; }
 .sw { width:40px; height:23px; border-radius:23px; background:#cfd6d1; position:relative;
-      flex:none; transition:background .2s; cursor:pointer; }
+      flex:none; transition:background .2s; cursor:pointer; margin-left:8px; }
 .sw::after { content:''; position:absolute; top:2px; left:2px; width:19px; height:19px;
              border-radius:50%; background:#fff; transition:transform .2s cubic-bezier(.34,1.56,.64,1); }
 .sw.on { background:#17b04b; }
 .sw.on::after { transform:translateX(17px); }
+
 .hist { margin-top:10px; }
 .chip { display:inline-block; background:#fff; border:1px solid #e6eae6; border-radius:12px;
         font-size:11px; color:#5a6660; padding:4px 10px; margin:0 6px 6px 0; }
@@ -66,17 +78,19 @@ h1 { font-size:22px; font-weight:600; color:#14231a; letter-spacing:-0.02em; }
 <body>
 <div class="wrap">
   <h1>今天吃啥</h1>
-  <div class="sub">河北东方学院订餐平台 · 转到哪家吃哪家，点「去点单」直达店铺菜单</div>
+  <div class="sub">河北东方学院订餐平台 · 全部店铺都在盘上，转到哪家吃哪家</div>
   <div class="src" id="src">正在拉取店铺…</div>
   <div class="topbtns">
     <a class="tbtn" id="refresh">重新拉取</a>
     <a class="tbtn" id="copybtn">复制链接</a>
   </div>
 
+  <div class="cates" id="cates"></div>
+
   <div class="stage">
     <div class="wheelbox">
-      <div id="rotor"><svg id="svg" width="300" height="300" viewBox="0 0 300 300"></svg></div>
-      <svg class="pointer" viewBox="0 0 22 26"><path d="M11 25 1 2h20L11 25Z" fill="#17b04b"/></svg>
+      <div id="rotor"><svg id="svg" width="100%" height="100%" viewBox="0 0 340 340"></svg></div>
+      <svg class="pointer" viewBox="0 0 22 27"><path d="M11 26 1 2h20L11 26Z" fill="#17b04b"/></svg>
       <button id="hub" type="button">转</button>
     </div>
     <div class="poolinfo" id="poolinfo"></div>
@@ -111,144 +125,200 @@ h1 { font-size:22px; font-weight:600; color:#14231a; letter-spacing:-0.02em; }
 <script>
 var API = 'https://waimai.xyan.cn';
 var H5  = 'https://waimai.xyan.cn/user/#/pages/index/index';
-var TENANTS = [
-  { appid:'hbdfxy',  site:'128052' },
-  { appid:'hbdfxycs', site:'0' }
-];
-var WHEEL_MAX = 12;           // 转盘最多几个扇区，超过就随机抽面上盘
-var SNAPSHOT = [
-  { shop_id:223, shop_name:'锅盔大锅菜了辛爆汁烤冷面D', shop_logo:'https://s.haohuoshi.net/uploads/images/20240315/7bf77a2e8961ecc9bbd5093250236b623843bc11.jpg', appid:'hbdfxy', site:'128052', source:'快照' },
-  { shop_id:242, shop_name:'校园自选快餐D', shop_logo:'https://s.haohuoshi.net/uploads/images/20250825/78100d7620e39d263a06519923304d0ba2c0dc16.jpg', appid:'hbdfxy', site:'128052', source:'快照' }
-];
+var TENANT = { appid:'hbdfxy', site:'128052' };
 
-var shops = [], enabled = {}, rotation = 0, spinning = false, histArr = [];
-var wheelShops = [], filter = '';
+/* 分类配色：同色系明度阶梯，相邻可分辨，绝不彩虹 */
+var SHADES = ['#e6f2ea','#ffffff','#dcefe3','#f4f9f5','#e9f4ec',
+              '#fbfdfc','#d5e9dd','#eef7f1','#e1f0e7','#ffffff'];
 
-function esc(s){ return String(s==null?'':s).replace(/[<>&"']/g, function(c){
+var shops=[], cats=[], enabled={}, rotation=0, spinning=false, histArr=[], filter='', cateFilter='';
+
+function esc(s){ return String(s==null?'':s).replace(/[<>&"']/g,function(c){
   return {'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&#39;'}[c]; }); }
-function key(s){ return String(s.shop_id != null ? s.shop_id : s.shop_name); }
-function pool(){ var a=[]; for(var i=0;i<shops.length;i++){ if(enabled[key(shops[i])]) a.push(shops[i]); } return a; }
-function shuffle(a){ for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
+function key(s){ return String(s.shop_id); }
+function pool(){ return shops.filter(function(s){ return enabled[key(s)]; }); }
 
-/* ---------- 存储 ---------- */
 function saveLocal(){
-  try{ localStorage.setItem('xw3-shops', JSON.stringify({shops:shops,enabled:enabled}));
-       localStorage.setItem('xw3-hist', JSON.stringify(histArr.slice(0,12))); }catch(e){}
+  try{ localStorage.setItem('xw4-shops', JSON.stringify({shops:shops,cats:cats,enabled:enabled}));
+       localStorage.setItem('xw4-hist', JSON.stringify(histArr.slice(0,12))); }catch(e){}
 }
 function loadLocal(){
   try{
-    var raw = localStorage.getItem('xw3-shops');
+    var raw=localStorage.getItem('xw4-shops');
     if(raw){ var d=JSON.parse(raw);
-      if(d.shops && d.shops.length){ shops=d.shops; enabled=d.enabled||{};
-        for(var i=0;i<shops.length;i++){ if(!(key(shops[i]) in enabled)) enabled[key(shops[i])]=1; }
+      if(d.shops && d.shops.length){ shops=d.shops; cats=d.cats||[]; enabled=d.enabled||{};
+        shops.forEach(function(s){ if(!(key(s) in enabled)) enabled[key(s)]=1; });
         return true; } }
-    var h=localStorage.getItem('xw3-hist'); if(h) histArr=JSON.parse(h);
+    var h=localStorage.getItem('xw4-hist'); if(h) histArr=JSON.parse(h);
   }catch(e){}
   return false;
 }
 
-/* ---------- 拉全量（关键：翻完所有页） ---------- */
-function postJSON(path, data, appid){
-  return new Promise(function(resolve, reject){
+/* ---------- 请求（带并发上限） ---------- */
+function postJSON(path, data){
+  return new Promise(function(resolve){
     var x=new XMLHttpRequest();
     x.open('POST', API+path, true);
     x.setRequestHeader('Content-Type','application/x-www-form-urlencoded; charset=UTF-8');
-    x.setRequestHeader('appid', appid);
+    x.setRequestHeader('appid', TENANT.appid);
     x.timeout=15000;
-    x.onload=function(){
-      try{ var j=JSON.parse(x.responseText); resolve(j); }catch(e){ reject(e); }
-    };
-    x.onerror=function(){ reject(new Error('网络错误')); };
-    x.ontimeout=function(){ reject(new Error('超时')); };
+    x.onload=function(){ try{ resolve(JSON.parse(x.responseText)); }catch(e){ resolve(null); } };
+    x.onerror=function(){ resolve(null); };
+    x.ontimeout=function(){ resolve(null); };
     x.send(data);
   });
 }
-
-function fetchTenantShops(t){
-  var all=[], page=1, last=1;
-  function step(){
-    if(page>last) return Promise.resolve(all);
-    return postJSON('/user/index/aloneDistribution','page='+page, t.appid).then(function(j){
-      if(j.code!==1 || !j.data || !j.data.shop_array) return all;
-      var sa=j.data.shop_array;
-      last = sa.last_page || 1;
-      var rows=sa.data||[];
-      for(var i=0;i<rows.length;i++){
-        var r=rows[i]; r.appid=t.appid; r.site=t.site; r.source='线上';
-        all.push(r);
+function limitRun(tasks, concurrency){
+  var i=0, results=[];
+  return new Promise(function(done){
+    var active=0, finished=0, total=tasks.length;
+    if(!total) return done(results);
+    function next(){
+      while(active<concurrency && i<total){
+        (function(idx){
+          active++;
+          tasks[idx]().then(function(r){ results[idx]=r; active--; finished++;
+            if(finished===total) done(results); else next(); });
+        })(i++);
       }
-      page++;
-      return step();
-    });
-  }
-  return step();
+    }
+    next();
+  });
 }
 
+/* 拉全量：分类 -> 每类逐页 */
 function loadAll(){
-  var tasks = TENANTS.map(function(t){
-    return fetchTenantShops(t).catch(function(){ return []; });
-  });
-  return Promise.all(tasks).then(function(lists){
-    var merged=[], seen={};
-    lists.forEach(function(rows){ rows.forEach(function(r){ var k=key(r); if(!seen[k]){ seen[k]=1; merged.push(r); } }); });
-    return merged;
+  return postJSON('/user/Index/complexHome','').then(function(home){
+    var cateList = (home && home.data && home.data.shop_cate) || [];
+    var tasks=[], meta=[];
+    cateList.forEach(function(c, idx){
+      meta.push({ id:c.shop_cate_id, name:c.shop_cate_name, shade:SHADES[idx % SHADES.length] });
+      tasks.push(function(){
+        var out=[], page=1, last=1;
+        function step(){
+          if(page>last) return Promise.resolve(out);
+          return postJSON('/user/Index/cateShop','shop_cate_id='+c.shop_cate_id+'&page='+page).then(function(j){
+            var d=(j && j.data) || {};
+            last = d.last_page || 1;
+            (d.data||[]).forEach(function(s){
+              s.cate_id=c.shop_cate_id; s.cate_name=c.shop_cate_name;
+              s.shade = SHADES[idx % SHADES.length];
+              s.appid=TENANT.appid; s.site=TENANT.site;
+              out.push(s);
+            });
+            page++;
+            return step();
+          });
+        }
+        return step();
+      });
+    });
+    return limitRun(tasks, 4).then(function(lists){
+      var merged=[], seen={};
+      lists.forEach(function(rows){ (rows||[]).forEach(function(s){
+        if(!seen[s.shop_id]){ seen[s.shop_id]=1; merged.push(s); }
+      }); });
+      return { shops: merged, cats: meta };
+    });
   });
 }
 
 /* ---------- 转盘 ---------- */
-var CX=150, CY=150, R=140;
+var CX=170, CY=170, R=140;
 function polar(r,deg){ var rad=(deg-90)*Math.PI/180; return [CX+r*Math.cos(rad), CY+r*Math.sin(rad)]; }
+function darken(hex, amt){
+  if(!hex || hex[0] !== '#') return hex;
+  var v = parseInt(hex.slice(1),16);
+  var r = Math.max(0, ((v>>16)&255) - amt);
+  var g = Math.max(0, ((v>>8)&255) - amt);
+  var b = Math.max(0, (v&255) - amt);
+  return '#' + ((1<<24) + (r<<16) + (g<<8) + b).toString(16).slice(1);
+}
 function trunc(s,n){ s=String(s||'').trim(); return s.length>n? s.slice(0,n)+'…' : s; }
 
 function drawWheel(list){
   var n=list.length, parts=[];
-  parts.push('<circle cx="150" cy="150" r="140" fill="#ffffff" stroke="#e2e7e3"/>');
+  parts.push('<circle cx="170" cy="170" r="140" fill="#ffffff" stroke="#e2e7e3"/>');
   if(!n){ document.getElementById('svg').innerHTML=parts.join(''); return; }
+
   var seg=360/n;
+  var showText = n<=18;
+  var lastCate = null;
+
   for(var i=0;i<n;i++){
-    var a0=i*seg, a1=a0+seg, fill=(i%2===0)?'#e8f6ec':'#ffffff';
+    var s=list[i], a0=i*seg, a1=a0+seg;
     var p0=polar(R,a0), p1=polar(R,a1), large=(a1-a0)>180?1:0;
-    parts.push('<path d="M150 150 L'+p0[0].toFixed(1)+' '+p0[1].toFixed(1)+' A140 140 0 '+large+
-      ' 1 '+p1[0].toFixed(1)+' '+p1[1].toFixed(1)+' Z" fill="'+fill+'" stroke="#e2e7e3"/>');
-    var mid=a0+seg/2, tp=polar(R*0.62,mid), rot=mid+90;
-    if(rot>90&&rot<270) rot-=180;
-    var fs = n>9?10:(n>6?11:13);
-    parts.push('<text x="'+tp[0].toFixed(1)+'" y="'+tp[1].toFixed(1)+'" text-anchor="middle" '+
-      'dominant-baseline="middle" fill="#1a2e22" font-size="'+fs+'" font-family="PingFang SC,sans-serif" '+
-      'transform="rotate('+rot.toFixed(1)+' '+tp[0].toFixed(1)+' '+tp[1].toFixed(1)+')">'+
-      esc(trunc(list[i].shop_name, n>9?4:6))+'</text>');
+    parts.push('<path d="M170 170 L'+p0[0].toFixed(2)+' '+p0[1].toFixed(2)+' A140 140 0 '+large+
+      ' 1 '+p1[0].toFixed(2)+' '+p1[1].toFixed(2)+' Z" fill="'+((i%2)? darken(s.shade||'#ffffff',7) : (s.shade||'#ffffff'))+
+      '" stroke="#e3ebe6" stroke-width="0.8"/>');
+    // 分类分界线：加粗
+    if(lastCate!==null && s.cate_id!==lastCate){
+      parts.push('<line x1="170" y1="170" x2="'+p0[0].toFixed(2)+'" y2="'+p0[1].toFixed(2)+
+        '" stroke="#9dbfa9" stroke-width="1.6"/>');
+    }
+    lastCate = s.cate_id;
+    if(showText){
+      var mid=a0+seg/2, tp=polar(R*0.66,mid), rot=mid+90;
+      if(rot>90&&rot<270) rot-=180;
+      parts.push('<text x="'+tp[0].toFixed(1)+'" y="'+tp[1].toFixed(1)+'" text-anchor="middle" '+
+        'dominant-baseline="middle" fill="#1a2e22" font-size="'+(n>12?9:12)+'" font-family="PingFang SC,sans-serif" '+
+        'transform="rotate('+rot.toFixed(1)+' '+tp[0].toFixed(1)+' '+tp[1].toFixed(1)+')">'+
+        esc(trunc(s.shop_name, n>12?5:7))+'</text>');
+    }
   }
-  parts.push('<circle cx="150" cy="150" r="56" fill="#ffffff" stroke="#eef1ee"/>');
+
+  // 分类名：只在弧长足够（>=16°）时画到盘外
+  if(!showText){
+    var start=0;
+    while(start<n){
+      var cateId=list[start].cate_id, end=start;
+      while(end<n && list[end].cate_id===cateId) end++;
+      var span=(end-start)*seg;
+      if(span>=16){
+        var midDeg=(start+end)/2*seg;
+        var lp=polar(R+16, midDeg), rot2=midDeg+90;
+        if(rot2>90&&rot2<270) rot2-=180;
+        parts.push('<text x="'+lp[0].toFixed(1)+'" y="'+lp[1].toFixed(1)+'" text-anchor="middle" '+
+          'dominant-baseline="middle" fill="#7d8b84" font-size="8" font-family="PingFang SC,sans-serif" '+
+          'transform="rotate('+rot2.toFixed(1)+' '+lp[0].toFixed(1)+' '+lp[1].toFixed(1)+')">'+
+          esc(list[start].cate_name||'')+'</text>');
+      }
+      start=end;
+    }
+  }
+  parts.push('<circle cx="170" cy="170" r="56" fill="#ffffff" stroke="#eef1ee"/>');
   document.getElementById('svg').innerHTML=parts.join('');
 }
 
-function sampleWheel(){
-  var p = pool();
-  if(!p.length){ wheelShops=[]; return; }
-  if(p.length<=WHEEL_MAX){ wheelShops=p.slice(); return; }
-  wheelShops = shuffle(p.slice()).slice(0, WHEEL_MAX);
-}
-
-function updatePoolInfo(){
+function pickList(){
   var p=pool();
-  document.getElementById('poolinfo').textContent = p.length<=WHEEL_MAX
-    ? '参与 '+p.length+' 家'
-    : '参与 '+p.length+' 家 · 每次随机抽 '+WHEEL_MAX+' 家上盘，机会均等';
+  if(cateFilter) p=p.filter(function(s){ return String(s.cate_id)===String(cateFilter); });
+  return p;
+}
+function updatePoolInfo(){
+  var all=pool(), cur=pickList();
+  var txt = '全盘 '+all.length+' 家';
+  if(cateFilter){
+    var c=cats.filter(function(x){ return String(x.id)===String(cateFilter); })[0];
+    txt += ' · 当前只看「'+(c?c.name:'')+'」'+cur.length+' 家';
+  }else{
+    txt += ' · 全部在盘上，每格等概率';
+  }
+  document.getElementById('poolinfo').textContent = txt;
 }
 
 function spin(){
   if(spinning) return;
-  var p=pool();
-  if(p.length<2){ alert('至少勾选两家再转'); return; }
+  var list=pickList();
+  if(list.length<2){ alert('至少勾选两家再转'); return; }
   spinning=true;
   var hub=document.getElementById('hub'); hub.disabled=true; hub.textContent='…';
   document.getElementById('result').style.display='none';
 
-  sampleWheel();
-  drawWheel(wheelShops);
-  var n=wheelShops.length, seg=360/n;
+  drawWheel(list);
+  var n=list.length, seg=360/n;
   var idx=Math.floor(Math.random()*n);
-  var jitter=(Math.random()-0.5)*seg*0.7;
+  var jitter=(Math.random()-0.5)*seg*0.62;
   var target=(360-((idx+0.5)*seg+jitter)%360+360)%360;
   var cur=((rotation%360)+360)%360;
   rotation += 360*5 + ((target-cur+360)%360);
@@ -260,7 +330,7 @@ function spin(){
     if(done) return; done=true;
     setTimeout(function(){
       spinning=false; hub.disabled=false; hub.textContent='转';
-      showResult(wheelShops[idx]); pushHist(wheelShops[idx]);
+      showResult(list[idx]); pushHist(list[idx]);
     }, 60);
   };
   rotor.addEventListener('transitionend', finish, {once:true});
@@ -271,10 +341,10 @@ function showResult(s){
   document.getElementById('rname').textContent=s.shop_name;
   var img=document.getElementById('rimg');
   if(s.shop_logo){ img.src=s.shop_logo; img.style.display='block'; } else { img.style.display='none'; }
-  var meta=[]; if(s.score) meta.push('评分 '+s.score); if(s.month_sum) meta.push('月售 '+s.month_sum);
-  if(s.expected_delivery) meta.push(s.expected_delivery);
+  var meta=[]; if(s.cate_name) meta.push(s.cate_name);
+  if(s.score) meta.push('评分 '+s.score); if(s.month_sum) meta.push('月售 '+s.month_sum);
   document.getElementById('rmeta').textContent=meta.join(' · ')||' ';
-  document.getElementById('go').href = H5+'?a='+(s.appid||'hbdfxy')+'_'+(s.site||'128052')+'_'+encodeURIComponent(s.shop_id);
+  document.getElementById('go').href = H5+'?a='+(s.appid||TENANT.appid)+'_'+(s.site||TENANT.site)+'_'+encodeURIComponent(s.shop_id);
   document.getElementById('result').style.display='block';
 }
 function pushHist(s){
@@ -282,67 +352,100 @@ function pushHist(s){
   histArr=histArr.slice(0,12); saveLocal(); renderHist();
 }
 
-/* ---------- 列表 ---------- */
+/* ---------- 图例 / 列表 / 历史 ---------- */
+function renderCates(){
+  var html='<span class="cchip '+(cateFilter===''?'on':'')+'" data-cate="">全部<span class="cnum">'+shops.length+'</span></span>';
+  cats.forEach(function(c){
+    var cnt=shops.filter(function(s){ return s.cate_id===c.id; }).length;
+    if(!cnt) return;
+    html+='<span class="cchip '+(String(cateFilter)===String(c.id)?'on':'')+'" data-cate="'+c.id+'">'+
+      '<i class="cdot" style="background:'+c.shade+';border:1px solid #cfdcd4"></i>'+
+      esc(c.name)+'<span class="cnum">'+cnt+'</span></span>';
+  });
+  var box=document.getElementById('cates');
+  box.innerHTML=html;
+  Array.prototype.forEach.call(box.querySelectorAll('.cchip'), function(el){
+    el.addEventListener('click', function(){
+      var v=this.getAttribute('data-cate');
+      cateFilter = (cateFilter===v)?'':v;
+      renderCates(); renderList(); updatePoolInfo();
+      drawWheel(pickList()); resetRot();
+    });
+  });
+}
+
 function renderList(){
   var q=filter.trim().toLowerCase();
-  var arr=shops.filter(function(s){ return !q || String(s.shop_name).toLowerCase().indexOf(q)>=0; });
-  var on=pool().length;
-  document.getElementById('cnt').textContent = shops.length+' 家 · 已选 '+on;
+  var arr=shops.filter(function(s){
+    if(cateFilter && String(s.cate_id)!==String(cateFilter)) return false;
+    return !q || String(s.shop_name).toLowerCase().indexOf(q)>=0;
+  });
+  document.getElementById('cnt').textContent = shops.length+' 家 · 已选 '+pool().length;
   var html='';
-  for(var i=0;i<arr.length;i++){
-    var s=arr[i], k=key(s), isOn=!!enabled[k];
+  arr.forEach(function(s){
+    var k=key(s), isOn=!!enabled[k];
     html += '<div class="row">'+
       (s.shop_logo?'<img src="'+esc(s.shop_logo)+'" alt="" loading="lazy">':'')+
       '<div class="rinfo"><div class="rn">'+esc(s.shop_name)+'</div>'+
-      '<div class="rm">#'+esc(s.shop_id)+'</div></div>'+
+      '<div class="rm"><i class="cdot" style="background:'+s.shade+';border:1px solid #cfdcd4"></i>'+
+      esc(s.cate_name||'')+' · #'+esc(s.shop_id)+'</div></div>'+
       '<div class="sw'+(isOn?' on':'')+'" data-k="'+esc(k)+'"></div></div>';
-  }
+  });
   document.getElementById('list').innerHTML = html || '<div class="empty">没有匹配的店</div>';
-  var sws=document.querySelectorAll('#list .sw');
-  for(var j=0;j<sws.length;j++){
-    sws[j].addEventListener('click', function(){
+  Array.prototype.forEach.call(document.querySelectorAll('#list .sw'), function(el){
+    el.addEventListener('click', function(){
       var k=this.getAttribute('data-k');
       if(enabled[k]) delete enabled[k]; else enabled[k]=1;
       this.classList.toggle('on');
       saveLocal(); updatePoolInfo();
       document.getElementById('cnt').textContent = shops.length+' 家 · 已选 '+pool().length;
     });
-  }
+  });
 }
+
 function renderHist(){
   var h='';
   if(!histArr.length) h='<span class="chip">还没有转过</span>';
-  for(var i=0;i<histArr.length;i++){
-    var d=new Date(histArr[i].at);
+  histArr.forEach(function(it){
+    var d=new Date(it.at);
     var hm=(d.getHours()<10?'0':'')+d.getHours()+':'+(d.getMinutes()<10?'0':'')+d.getMinutes();
-    var nm=histArr[i].name.length>10?histArr[i].name.slice(0,10)+'…':histArr[i].name;
+    var nm=it.name.length>10?it.name.slice(0,10)+'…':it.name;
     h+='<span class="chip"><b>'+esc(nm)+'</b> '+hm+'</span>';
-  }
+  });
   document.getElementById('hist').innerHTML=h;
 }
 
+function resetRot(){
+  var r=document.getElementById('rotor');
+  r.style.transition='none'; rotation=0; r.style.transform='rotate(0deg)';
+  void r.offsetWidth; r.style.transition='';
+}
+
 /* ---------- 启动 ---------- */
-function setSrc(t, bad){ document.getElementById('src').textContent=t;
-  document.getElementById('src').style.color = bad?'#c0392b':'#8a948d'; }
+function setSrc(t,bad){ var e=document.getElementById('src'); e.textContent=t;
+  e.style.color = bad? '#c0392b':'#8a948d'; }
+
+function renderAll(){
+  renderCates(); renderList(); updatePoolInfo(); drawWheel(pickList());
+}
 
 function boot(force){
   if(!force && loadLocal()){
-    renderList(); renderHist(); updatePoolInfo(); sampleWheel(); drawWheel(wheelShops);
     setSrc('本地缓存 '+shops.length+' 家 · 点「重新拉取」更新');
-    return;
+    renderAll(); renderHist(); return;
   }
-  setSrc('正在拉取全部店铺（约 12 页）…');
-  loadAll().then(function(list){
-    if(!list.length){
-      shops=SNAPSHOT.slice(); enabled={};
-      for(var i=0;i<shops.length;i++) enabled[key(shops[i])]=1;
-      setSrc('接口没返回数据，已用内置快照 '+shops.length+' 家', true);
-    }else{
-      shops=list; enabled={};
-      for(var j=0;j<shops.length;j++) enabled[key(shops[j])]=1;
-      setSrc('已加载全部 '+shops.length+' 家 · '+new Date().toTimeString().slice(0,5));
+  setSrc('正在拉取全部店铺…');
+  loadAll().then(function(res){
+    if(!res || !res.shops.length){
+      setSrc('接口没返回数据，请点「重新拉取」', true);
+      document.getElementById('list').innerHTML='<div class="empty">没有拉到店铺</div>';
+      return;
     }
-    saveLocal(); renderList(); renderHist(); updatePoolInfo(); sampleWheel(); drawWheel(wheelShops);
+    shops=res.shops; cats=res.cats; enabled={};
+    shops.forEach(function(s){ enabled[key(s)]=1; });
+    saveLocal();
+    setSrc('已加载全部 '+shops.length+' 家 · '+new Date().toTimeString().slice(0,5));
+    renderAll(); renderHist();
   });
 }
 
@@ -356,8 +459,7 @@ document.getElementById('copybtn').addEventListener('click', function(){
 });
 document.getElementById('q').addEventListener('input', function(){ filter=this.value; renderList(); });
 document.getElementById('allOn').addEventListener('click', function(){
-  for(var i=0;i<shops.length;i++) enabled[key(shops[i])]=1;
-  saveLocal(); renderList(); updatePoolInfo();
+  shops.forEach(function(s){ enabled[key(s)]=1; }); saveLocal(); renderList(); updatePoolInfo();
 });
 document.getElementById('allOff').addEventListener('click', function(){
   enabled={}; saveLocal(); renderList(); updatePoolInfo();

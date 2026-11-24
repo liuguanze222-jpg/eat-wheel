@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<title>今天吃啥 · 三级转盘</title>
+<title>今天吃啥 · 分开转</title>
 <style>
 * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
 body { background:#f4f6f4; color:#1c2620; font-family:PingFang SC,Hiragino Sans GB,Microsoft YaHei,system-ui,sans-serif; }
@@ -14,40 +14,47 @@ h1 { font-size:22px; font-weight:600; color:#14231a; letter-spacing:-0.02em; }
 .topbtns { margin-top:10px; }
 .tbtn { display:inline-block; border:1px solid #d5ddd6; background:#fff; color:#2a3a30;
         font-size:12px; padding:6px 12px; border-radius:16px; margin:0 8px 8px 0; cursor:pointer; }
-.tbtn.on { border-color:#17b04b; color:#0f7a35; background:#f2fbf5; }
 
-/* 路径面包屑 */
-.crumb { margin-top:12px; display:flex; align-items:center; flex-wrap:wrap; gap:6px;
-         font-size:12px; color:#7d8b84; min-height:20px; }
-.crumb b { color:#14231a; font-weight:600; }
-.crumb .sep { color:#c3cec7; }
-.crumb.crumb--empty { color:#a6afa9; }
+/* 三个层级标签 */
+.tabs { margin-top:12px; display:flex; gap:6px; background:#eef2ef; padding:4px; border-radius:12px; }
+.tab { flex:1; text-align:center; font-size:13px; color:#5a6660; padding:8px 0; border-radius:9px;
+       cursor:pointer; transition:background .16s,color .16s; }
+.tab b { font-weight:600; }
+.tab .n { font-size:10px; color:#98a29b; margin-left:3px; }
+.tab.on { background:#fff; color:#0f7a35; box-shadow:0 1px 3px rgba(20,40,28,.10); }
+.tab.on .n { color:#5aa877; }
 
-.stage { position:relative; margin-top:8px; }
-.wheelbox { position:relative; width:min(340px,84vw); aspect-ratio:1/1; margin:8px auto 0; }
+/* 当前选择 */
+.picks { margin-top:10px; display:flex; flex-wrap:wrap; gap:6px; min-height:26px; }
+.pick { display:inline-flex; align-items:center; gap:6px; font-size:12px; color:#14231a;
+        background:#fff; border:1px solid #dfe7e2; border-radius:14px; padding:4px 6px 4px 10px; }
+.pick i { font-style:normal; color:#98a29b; font-size:10px; }
+.pick .x { width:16px; height:16px; line-height:15px; text-align:center; border-radius:50%;
+           background:#f1f5f2; color:#7d8b84; cursor:pointer; font-size:11px; }
+.pick.none { color:#a6afa9; background:transparent; border-style:dashed; }
+
+.stage { position:relative; }
+.wheelbox { position:relative; width:min(330px,82vw); aspect-ratio:1/1; margin:6px auto 0; }
 #rotor { position:absolute; left:0; top:0; width:100%; height:100%;
-         transition:transform 3.2s cubic-bezier(0.12,0.8,0.08,1); }
+         transition:transform 3s cubic-bezier(0.12,0.8,0.08,1); }
 .pointer { position:absolute; top:-9px; left:50%; margin-left:-11px; width:22px; height:27px; z-index:3; }
 #hub { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
-       width:68px; height:68px; border-radius:50%; background:#fff; border:1px solid #dfe5e0;
-       color:#14231a; font-size:20px; font-weight:600; cursor:pointer; z-index:2;
+       width:66px; height:66px; border-radius:50%; background:#fff; border:1px solid #dfe5e0;
+       color:#14231a; font-size:19px; font-weight:600; cursor:pointer; z-index:2;
        box-shadow:0 2px 8px rgba(20,40,28,.10); }
 #hub:disabled { color:#98a29b; }
-.actions { text-align:center; margin-top:14px; }
-.actions .tbtn { margin:0 4px; }
+.hint { text-align:center; font-size:11px; color:#8a948d; margin-top:10px; line-height:1.6; }
 
-.result { margin-top:14px; background:#fff; border:1px solid #e6eae6; border-radius:14px;
+.result { margin-top:12px; background:#fff; border:1px solid #e6eae6; border-radius:14px;
           padding:14px 16px; text-align:left; box-shadow:0 2px 10px rgba(20,40,28,.05); }
 .rrow { display:flex; align-items:center; }
-.rimg { width:52px; height:52px; border-radius:10px; margin-right:12px; background:#eef1ee; flex:none; }
-.rname { font-size:16px; font-weight:600; color:#14231a; line-height:1.35; }
+.rimg { width:50px; height:50px; border-radius:10px; margin-right:12px; background:#eef1ee; flex:none; }
+.rname { font-size:15px; font-weight:600; color:#14231a; line-height:1.35; }
 .rmeta { font-size:12px; color:#6b7670; margin-top:3px; }
 .rpick { font-size:13px; color:#0f7a35; font-weight:600; margin-top:6px; }
 .rbtns { margin-top:10px; }
 .go { display:inline-block; background:#17b04b; color:#fff; font-size:13px; padding:8px 16px;
       border-radius:8px; text-decoration:none; margin-right:8px; }
-.again { display:inline-block; border:1px solid #d5ddd6; color:#2a3a30; font-size:13px;
-         padding:8px 14px; border-radius:8px; background:#fff; cursor:pointer; }
 
 .sec { margin-top:22px; font-size:15px; font-weight:600; color:#14231a; }
 .count { font-size:11px; color:#8a948d; font-weight:normal; margin-left:6px; }
@@ -56,13 +63,13 @@ h1 { font-size:22px; font-weight:600; color:#14231a; letter-spacing:-0.02em; }
                    padding:9px 10px; font-size:13px; color:#1c2620; background:#fff; }
 .minibtn { border:1px solid #d5ddd6; background:#fff; color:#2a3a30; font-size:12px;
            padding:0 12px; border-radius:8px; cursor:pointer; }
-.list { margin-top:10px; max-height:440px; overflow-y:auto; -webkit-overflow-scrolling:touch; }
+.list { margin-top:10px; max-height:420px; overflow-y:auto; -webkit-overflow-scrolling:touch; }
 .row { background:#fff; border:1px solid #e6eae6; border-radius:10px; padding:9px 10px; margin-bottom:7px; }
 .rowtop { display:flex; align-items:center; }
-.row img { width:36px; height:36px; border-radius:8px; margin-right:9px; background:#eef1ee; flex:none; }
+.row img { width:34px; height:34px; border-radius:8px; margin-right:9px; background:#eef1ee; flex:none; }
 .rinfo { flex:1; min-width:0; }
 .rn { font-size:13px; color:#1c2620; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.rm { font-size:10px; color:#8a948d; margin-top:2px; display:flex; align-items:center; gap:5px; }
+.rm { font-size:10px; color:#8a948d; margin-top:2px; }
 .sw { width:40px; height:23px; border-radius:23px; background:#cfd6d1; position:relative;
       flex:none; transition:background .2s; cursor:pointer; margin-left:8px; }
 .sw::after { content:''; position:absolute; top:2px; left:2px; width:19px; height:19px;
@@ -86,15 +93,21 @@ h1 { font-size:22px; font-weight:600; color:#14231a; letter-spacing:-0.02em; }
 <body>
 <div class="wrap">
   <h1>今天吃啥</h1>
-  <div class="sub">先转餐厅 → 再转这家店的窗口 → 最后转吃什么</div>
+  <div class="sub">三个盘分开转，先转哪个都行</div>
   <div class="src" id="src">正在拉取店铺…</div>
   <div class="topbtns">
     <a class="tbtn" id="refresh">重新拉取</a>
     <a class="tbtn" id="copybtn">复制链接</a>
-    <a class="tbtn" id="modeBtn">模式：三级</a>
+    <a class="tbtn" id="clearAll">清空选择</a>
   </div>
 
-  <div class="crumb crumb--empty" id="crumb">还没开始</div>
+  <div class="tabs">
+    <div class="tab on" data-lv="1">餐厅<span class="n" id="n1"></span></div>
+    <div class="tab" data-lv="2">窗口<span class="n" id="n2"></span></div>
+    <div class="tab" data-lv="3">菜品<span class="n" id="n3"></span></div>
+  </div>
+
+  <div class="picks" id="picks"></div>
 
   <div class="stage">
     <div class="wheelbox">
@@ -102,10 +115,7 @@ h1 { font-size:22px; font-weight:600; color:#14231a; letter-spacing:-0.02em; }
       <svg class="pointer" viewBox="0 0 22 27"><path d="M11 26 1 2h20L11 26Z" fill="#17b04b"/></svg>
       <button id="hub" type="button">转</button>
     </div>
-    <div class="actions">
-      <a class="tbtn" id="again">再转一次</a>
-      <a class="tbtn" id="reset">从头开始</a>
-    </div>
+    <div class="hint" id="hint"></div>
 
     <div class="result" id="result" style="display:none">
       <div class="rrow">
@@ -118,7 +128,6 @@ h1 { font-size:22px; font-weight:600; color:#14231a; letter-spacing:-0.02em; }
       </div>
       <div class="rbtns">
         <a class="go" id="go" href="#">去点单</a>
-        <a class="again" id="again2">再转一次</a>
       </div>
     </div>
   </div>
@@ -136,50 +145,48 @@ h1 { font-size:22px; font-weight:600; color:#14231a; letter-spacing:-0.02em; }
 </div>
 
 <script>
-var API = 'https://waimai.xyan.cn';
-var H5  = 'https://waimai.xyan.cn/user/#/pages/index/index';
-var TENANT = { appid:'hbdfxy', site:'128052' };
+var API='https://waimai.xyan.cn';
+var H5='https://waimai.xyan.cn/user/#/pages/index/index';
+var TENANT={appid:'hbdfxy', site:'128052'};
 
-var CAT_SHADES = ['#e6f2ea','#ffffff','#dcefe3','#f4f9f5','#e9f4ec',
-                  '#fbfdfc','#d5e9dd','#eef7f1','#e1f0e7','#ffffff'];
-var DISH_SHADES = ['#eef7f1','#ffffff','#e4f2e9','#f7fbf8','#eaf5ee','#fdfefd'];
-var DEFAULT_DISHES = ['主食','小吃','饮品','套餐'];
+var CAT_SHADES=['#e6f2ea','#ffffff','#dcefe3','#f4f9f5','#e9f4ec','#fbfdfc','#d5e9dd','#eef7f1','#e1f0e7','#ffffff'];
+var DISH_SHADES=['#eef7f1','#ffffff','#e4f2e9','#f7fbf8','#eaf5ee','#fdfefd'];
+var DEFAULT_DISHES=['主食','小吃','饮品','套餐'];
 
 var shops=[], cats=[], enabled={}, histArr=[];
-var mode='three';                 // 'three' | 'shop'
-var pickedCate=null, pickedShop=null, pickedDish=null;
-var rotation=0, spinning=false;
+var level=1;                                  // 当前正在转的层级
+var picked={ cate:null, shop:null, dish:null };// 各自独立
+var rotation={ 1:0, 2:0, 3:0 };
+var spinning=false, wheelItems=[];
 
 function esc(s){ return String(s==null?'':s).replace(/[<>&"']/g,function(c){
   return {'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&#39;'}[c]; }); }
 function key(s){ return String(s.shop_id); }
 function pool(){ return shops.filter(function(s){ return enabled[key(s)]; }); }
-function darken(hex, amt){
-  if(!hex || hex[0] !== '#') return hex;
+function darken(hex,amt){ if(!hex||hex[0]!=='#') return hex;
   var v=parseInt(hex.slice(1),16);
   var r=Math.max(0,((v>>16)&255)-amt), g=Math.max(0,((v>>8)&255)-amt), b=Math.max(0,(v&255)-amt);
-  return '#'+((1<<24)+(r<<16)+(g<<8)+b).toString(16).slice(1);
-}
+  return '#'+((1<<24)+(r<<16)+(g<<8)+b).toString(16).slice(1); }
 function trunc(s,n){ s=String(s||'').trim(); return s.length>n? s.slice(0,n)+'…' : s; }
 
 /* ---------- 存储 ---------- */
 function saveLocal(){
   try{
-    localStorage.setItem('xw5-shops', JSON.stringify({shops:shops,cats:cats,enabled:enabled}));
-    localStorage.setItem('xw5-hist', JSON.stringify(histArr.slice(0,12)));
-    localStorage.setItem('xw5-mode', mode);
+    localStorage.setItem('xw6-shops',JSON.stringify({shops:shops,cats:cats,enabled:enabled}));
+    localStorage.setItem('xw6-hist',JSON.stringify(histArr.slice(0,12)));
+    localStorage.setItem('xw6-pick',JSON.stringify(picked));
   }catch(e){}
 }
 function loadLocal(){
   try{
-    var raw=localStorage.getItem('xw5-shops');
-    var m=localStorage.getItem('xw5-mode'); if(m) mode=m;
+    var raw=localStorage.getItem('xw6-shops');
+    var p=localStorage.getItem('xw6-pick'); if(p){ var pp=JSON.parse(p); if(pp) picked=pp; }
     if(raw){ var d=JSON.parse(raw);
-      if(d.shops && d.shops.length){ shops=d.shops; cats=d.cats||[]; enabled=d.enabled||{};
+      if(d.shops&&d.shops.length){ shops=d.shops; cats=d.cats||[]; enabled=d.enabled||{};
         shops.forEach(function(s){ if(!(key(s) in enabled)) enabled[key(s)]=1;
-          if(!s.dishes || !s.dishes.length) s.dishes=DEFAULT_DISHES.slice(); });
+          if(!s.dishes||!s.dishes.length) s.dishes=DEFAULT_DISHES.slice(); });
         return true; } }
-    var h=localStorage.getItem('xw5-hist'); if(h) histArr=JSON.parse(h);
+    var h=localStorage.getItem('xw6-hist'); if(h) histArr=JSON.parse(h);
   }catch(e){}
   return false;
 }
@@ -188,292 +195,307 @@ function loadLocal(){
 function postJSON(path,data){
   return new Promise(function(resolve){
     var x=new XMLHttpRequest();
-    x.open('POST', API+path, true);
+    x.open('POST',API+path,true);
     x.setRequestHeader('Content-Type','application/x-www-form-urlencoded; charset=UTF-8');
-    x.setRequestHeader('appid', TENANT.appid);
+    x.setRequestHeader('appid',TENANT.appid);
     x.timeout=15000;
-    x.onload=function(){ try{ resolve(JSON.parse(x.responseText)); }catch(e){ resolve(null); } };
+    x.onload=function(){ try{resolve(JSON.parse(x.responseText));}catch(e){resolve(null);} };
     x.onerror=function(){ resolve(null); };
     x.ontimeout=function(){ resolve(null); };
     x.send(data);
   });
 }
-function limitRun(tasks, concurrency){
-  var i=0, results=[];
+function limitRun(tasks,c){
+  var i=0,res=[];
   return new Promise(function(done){
-    var active=0, finished=0, total=tasks.length;
-    if(!total) return done(results);
+    var active=0,fin=0,total=tasks.length;
+    if(!total) return done(res);
     function next(){
-      while(active<concurrency && i<total){
-        (function(idx){
-          active++;
-          tasks[idx]().then(function(r){ results[idx]=r; active--; finished++;
-            if(finished===total) done(results); else next(); });
-        })(i++);
-      }
+      while(active<c&&i<total){ (function(idx){ active++;
+        tasks[idx]().then(function(r){ res[idx]=r; active--; fin++;
+          if(fin===total) done(res); else next(); }); })(i++); }
     }
     next();
   });
 }
 function loadAll(){
   return postJSON('/user/Index/complexHome','').then(function(home){
-    var list=(home && home.data && home.data.shop_cate) || [];
-    var tasks=[], meta=[];
-    list.forEach(function(c, idx){
-      meta.push({ id:c.shop_cate_id, name:c.shop_cate_name, shade:CAT_SHADES[idx%CAT_SHADES.length] });
+    var list=(home&&home.data&&home.data.shop_cate)||[];
+    var tasks=[],meta=[];
+    list.forEach(function(c,idx){
+      meta.push({id:c.shop_cate_id,name:c.shop_cate_name,shade:CAT_SHADES[idx%CAT_SHADES.length]});
       tasks.push(function(){
-        var out=[], page=1, last=1;
+        var out=[],page=1,last=1;
         function step(){
           if(page>last) return Promise.resolve(out);
           return postJSON('/user/Index/cateShop','shop_cate_id='+c.shop_cate_id+'&page='+page).then(function(j){
-            var d=(j && j.data) || {};
-            last=d.last_page||1;
+            var d=(j&&j.data)||{}; last=d.last_page||1;
             (d.data||[]).forEach(function(s){
               s.cate_id=c.shop_cate_id; s.cate_name=c.shop_cate_name;
               s.shade=CAT_SHADES[idx%CAT_SHADES.length];
               s.appid=TENANT.appid; s.site=TENANT.site;
-              s.dishes = (s.dishes && s.dishes.length) ? s.dishes : DEFAULT_DISHES.slice();
+              s.dishes=(s.dishes&&s.dishes.length)?s.dishes:DEFAULT_DISHES.slice();
               out.push(s);
             });
-            page++;
-            return step();
+            page++; return step();
           });
         }
         return step();
       });
     });
     return limitRun(tasks,4).then(function(lists){
-      var merged=[], seen={};
+      var merged=[],seen={};
       lists.forEach(function(rows){ (rows||[]).forEach(function(s){
-        if(!seen[s.shop_id]){ seen[s.shop_id]=1; merged.push(s); }
-      }); });
-      return { shops:merged, cats:meta };
+        if(!seen[s.shop_id]){ seen[s.shop_id]=1; merged.push(s); } }); });
+      return {shops:merged,cats:meta};
     });
   });
 }
 
-/* ---------- 转盘 ---------- */
-var CX=170, CY=170, R=140;
-function polar(r,deg){ var rad=(deg-90)*Math.PI/180; return [CX+r*Math.cos(rad), CY+r*Math.sin(rad)]; }
+/* ---------- 每级的候选 ---------- */
+function cateItems(){
+  var p=pool(),map={},order=[];
+  p.forEach(function(s){ var k=String(s.cate_id);
+    if(!map[k]){ map[k]={id:s.cate_id,name:s.cate_name,shade:s.shade,shops:[]}; order.push(k); }
+    map[k].shops.push(s); });
+  return order.map(function(k){ return map[k]; });
+}
+function shopItems(){
+  var p=pool();
+  if(picked.cate) p=p.filter(function(s){ return String(s.cate_id)===String(picked.cate.id); });
+  return p;
+}
+function dishItems(){
+  if(picked.shop){
+    var d=(picked.shop.dishes&&picked.shop.dishes.length)?picked.shop.dishes:DEFAULT_DISHES;
+    return d.map(function(x,i){ return {name:x, shade:DISH_SHADES[i%DISH_SHADES.length]}; });
+  }
+  return DEFAULT_DISHES.map(function(x,i){ return {name:x, shade:DISH_SHADES[i%DISH_SHADES.length]}; });
+}
+function itemsOf(lv){
+  if(lv===1) return cateItems();
+  if(lv===2) return shopItems();
+  return dishItems();
+}
 
-function drawWheel(items, opt){
-  opt = opt || {};
-  var n=items.length, parts=[];
+/* ---------- 画盘 ---------- */
+var CX=170,CY=170,R=140;
+function polar(r,deg){ var rad=(deg-90)*Math.PI/180; return [CX+r*Math.cos(rad),CY+r*Math.sin(rad)]; }
+function drawWheel(items,opt){
+  opt=opt||{};
+  var n=items.length,parts=[];
   parts.push('<circle cx="170" cy="170" r="140" fill="#ffffff" stroke="#e2e7e3"/>');
   if(!n){ document.getElementById('svg').innerHTML=parts.join(''); return; }
-  var seg=360/n, showText = n<=18;
-  var radiiLabel = opt.radiiLabel !== false;
-
+  var seg=360/n, showText=n<=20;
   for(var i=0;i<n;i++){
-    var it=items[i], a0=i*seg, a1=a0+seg;
-    var p0=polar(R,a0), p1=polar(R,a1), large=(a1-a0)>180?1:0;
-    var base=it.shade || opt.shade || '#ffffff';
-    var fill=(i%2)? darken(base,7) : base;
+    var it=items[i],a0=i*seg,a1=a0+seg;
+    var p0=polar(R,a0),p1=polar(R,a1),large=(a1-a0)>180?1:0;
+    var base=it.shade||opt.shade||'#ffffff';
+    var fill=(i%2)?darken(base,7):base;
     parts.push('<path d="M170 170 L'+p0[0].toFixed(2)+' '+p0[1].toFixed(2)+' A140 140 0 '+large+
       ' 1 '+p1[0].toFixed(2)+' '+p1[1].toFixed(2)+' Z" fill="'+fill+
       '" stroke="#e3ebe6" stroke-width="0.8"/>');
     if(showText){
-      var mid=a0+seg/2, tp=polar(R*0.66,mid), rot=mid+90;
+      var mid=a0+seg/2,tp=polar(R*0.66,mid),rot=mid+90;
       if(rot>90&&rot<270) rot-=180;
-      var label = opt.label ? opt.label(it) : (it.name||it.shop_name||'');
+      var label=opt.label?opt.label(it):(it.name||it.shop_name||'');
       parts.push('<text x="'+tp[0].toFixed(1)+'" y="'+tp[1].toFixed(1)+'" text-anchor="middle" '+
         'dominant-baseline="middle" fill="#1a2e22" font-size="'+(n>12?9:12)+'" font-family="PingFang SC,sans-serif" '+
         'transform="rotate('+rot.toFixed(1)+' '+tp[0].toFixed(1)+' '+tp[1].toFixed(1)+')">'+
-        esc(trunc(label, n>12?5:(opt.chars||7)))+'</text>');
+        esc(trunc(label,n>12?5:7))+'</text>');
     }
   }
-  if(!showText && radiiLabel && opt.groupKey){
-    var start=0;
-    while(start<n){
-      var g=opt.groupKey(items[start]), end=start;
-      while(end<n && opt.groupKey(items[end])===g) end++;
-      var span=(end-start)*seg;
+  if(!showText&&opt.groupKey){
+    var st=0;
+    while(st<n){
+      var g=opt.groupKey(items[st]),en=st;
+      while(en<n&&opt.groupKey(items[en])===g) en++;
+      var span=(en-st)*seg;
       if(span>=16){
-        var midDeg=(start+end)/2*seg, lp=polar(R+16,midDeg), rot2=midDeg+90;
+        var md=(st+en)/2*seg,lp=polar(R+16,md),rot2=md+90;
         if(rot2>90&&rot2<270) rot2-=180;
         parts.push('<text x="'+lp[0].toFixed(1)+'" y="'+lp[1].toFixed(1)+'" text-anchor="middle" '+
           'dominant-baseline="middle" fill="#7d8b84" font-size="8" font-family="PingFang SC,sans-serif" '+
           'transform="rotate('+rot2.toFixed(1)+' '+lp[0].toFixed(1)+' '+lp[1].toFixed(1)+')">'+
-          esc(opt.groupLabel ? opt.groupLabel(items[start]) : '')+'</text>');
+          esc(opt.groupLabel?opt.groupLabel(items[st]):'')+'</text>');
       }
-      start=end;
+      st=en;
     }
   }
   parts.push('<circle cx="170" cy="170" r="56" fill="#ffffff" stroke="#eef1ee"/>');
   document.getElementById('svg').innerHTML=parts.join('');
 }
 
-/* 转一次，返回被选中的 item（Promise） */
-function spinOnce(items, duration){
-  return new Promise(function(resolve){
-    var n=items.length;
-    if(n<1){ resolve(null); return; }
-    var rotor=document.getElementById('rotor');
-    rotor.style.transitionDuration=(duration||3200)+'ms';
-
-    var seg=360/n;
-    var idx=Math.floor(Math.random()*n);
-    var jitter=(Math.random()-0.5)*seg*0.62;
-    var target=(360-((idx+0.5)*seg+jitter)%360+360)%360;
-    var cur=((rotation%360)+360)%360;
-    rotation += 360*3 + ((target-cur+360)%360);
-    rotor.style.transform='rotate('+rotation+'deg)';
-
-    var done=false;
-    function finish(){
-      if(done) return; done=true;
-      setTimeout(function(){ resolve(idx); }, 80);
-    }
-    rotor.addEventListener('transitionend', finish, {once:true});
-    setTimeout(finish, (duration||3200)+900);
-  });
+function wheelOption(lv){
+  if(lv===1) return { groupKey:function(c){return c.id;}, groupLabel:function(c){return c.name;},
+                      label:function(c){return c.name;} };
+  if(lv===2) return { shade:'#eef7f1', label:function(s){return s.shop_name;},
+                      groupKey:function(s){return s.cate_id;}, groupLabel:function(s){return s.cate_name;} };
+  return { label:function(d){return d.name;} };
 }
 
-/* ---------- 三级流程 ---------- */
-function catList(){
-  var p=pool(), map={}, order=[];
-  p.forEach(function(s){
-    var k=String(s.cate_id);
-    if(!map[k]){ map[k]={ id:s.cate_id, name:s.cate_name, shade:s.shade, shops:[] }; order.push(k); }
-    map[k].shops.push(s);
-  });
-  return order.map(function(k){ return map[k]; });
-}
-function shopsOfCate(id){ return pool().filter(function(s){ return String(s.cate_id)===String(id); }); }
-
-function setCrumb(p){
-  var el=document.getElementById('crumb');
-  if(!p.length){ el.className='crumb crumb--empty'; el.textContent='还没开始'; return; }
-  el.className='crumb';
-  el.innerHTML = p.map(function(x){ return '<b>'+esc(x)+'</b>'; }).join('<span class="sep">›</span>');
-}
-
-function resetFlow(){
-  pickedCate=null; pickedShop=null; pickedDish=null;
-  document.getElementById('result').style.display='none';
-  setCrumb([]);
-  drawWheel(catList(), {groupKey:function(c){return c.id;}, groupLabel:function(c){return c.name;},
-                        label:function(c){ return c.name; }, chars:6});
+function renderWheelFor(lv){
+  wheelItems=itemsOf(lv);
+  drawWheel(wheelItems, wheelOption(lv));
+  // 回到该级常用角度，避免视觉跳变
+  var rotor=document.getElementById('rotor');
+  rotor.style.transition='none';
+  rotor.style.transform='rotate('+rotation[lv]+'deg)';
+  void rotor.offsetWidth;
+  rotor.style.transition='';
   document.getElementById('hub').textContent='转';
 }
 
-function onSpin(){
+/* ---------- 转当前级 ---------- */
+function spinCurrent(){
   if(spinning) return;
+  var items=itemsOf(level);
+  if(!items.length){ alert('这一层没有可选项'); return; }
   spinning=true;
   var hub=document.getElementById('hub'); hub.disabled=true; hub.textContent='…';
-  document.getElementById('result').style.display='none';
 
-  // 单盘模式：直接在所有店里转
-  if(mode!=='three'){
-    var all=pool();
-    if(!all.length){ spinning=false; hub.disabled=false; hub.textContent='转'; alert('没有可选店铺'); return; }
-    drawWheel(all, {groupKey:function(s){return s.cate_id;}, groupLabel:function(s){return s.cate_name;},
-                    label:function(s){return s.shop_name;}});
-    setCrumb(['转店铺…']);
-    spinOnce(all, 3400).then(function(i){
-      var s=all[i];
-      setCrumb([s.cate_name, s.shop_name]);
-      finish(s, null);
+  wheelItems=items;
+  drawWheel(items,wheelOption(level));
+
+  var rotor=document.getElementById('rotor');
+  var n=items.length, seg=360/n;
+  var idx=Math.floor(Math.random()*n);
+  var jitter=(Math.random()-0.5)*seg*0.62;
+  var target=(360-((idx+0.5)*seg+jitter)%360+360)%360;
+  var cur=((rotation[level]%360)+360)%360;
+  rotation[level]+=360*3+((target-cur+360)%360);
+  rotor.style.transitionDuration='3000ms';
+  rotor.style.transform='rotate('+rotation[level]+'deg)';
+
+  var done=false;
+  function finish(){
+    if(done) return; done=true;
+    setTimeout(function(){
       spinning=false; hub.disabled=false; hub.textContent='转';
-    });
-    return;
+      applyPick(level, items[idx]);
+    },80);
   }
-
-  // 三级模式
-  var cl=catList();
-  if(!cl.length){ spinning=false; hub.disabled=false; hub.textContent='转'; alert('没有可选店铺'); return; }
-
-  drawWheel(cl, {groupKey:function(c){return c.id;}, groupLabel:function(c){return c.name;},
-                 label:function(c){return c.name;}, chars:6});
-  setCrumb(['转餐厅…']);
-
-  spinOnce(cl, 2400)
-    .then(function(i){
-      var c=cl[i];
-      pickedCate=c;
-      setCrumb([c.name]);
-      // 第二级：这家店（餐厅）的窗口
-      var sl=c.shops;
-      drawWheel(sl, {shade:'#eef7f1', label:function(s){return s.shop_name;}});
-      setCrumb([c.name, '转窗口…']);
-      return spinOnce(sl, 2600).then(function(j){
-        var s=sl[j];
-        pickedShop=s;
-        setCrumb([c.name, s.shop_name]);
-        // 第三级：这家店的菜品分类
-        var dl=(s.dishes && s.dishes.length ? s.dishes : DEFAULT_DISHES).map(function(d,k){
-          return { name:d, shade:DISH_SHADES[k%DISH_SHADES.length] };
-        });
-        drawWheel(dl, {label:function(d){return d.name;}});
-        setCrumb([c.name, s.shop_name, '转吃什么…']);
-        return spinOnce(dl, 2200).then(function(k2){
-          pickedDish=dl[k2].name;
-          setCrumb([c.name, s.shop_name, pickedDish]);
-          finish(s, pickedDish);
-        });
-      });
-    })
-    .then(function(){ spinning=false; hub.disabled=false; hub.textContent='转'; })
-    .catch(function(){ spinning=false; hub.disabled=false; hub.textContent='转'; });
+  rotor.addEventListener('transitionend',finish,{once:true});
+  setTimeout(finish,3900);
 }
 
-function finish(shop, dish){
-  if(!shop){ document.getElementById('result').style.display='none'; return; }
-  document.getElementById('rname').textContent=shop.shop_name;
-  var img=document.getElementById('rimg');
-  if(shop.shop_logo){ img.src=shop.shop_logo; img.style.display='block'; } else { img.style.display='none'; }
-  var meta=[]; if(shop.cate_name) meta.push(shop.cate_name);
-  if(shop.score) meta.push('评分 '+shop.score);
-  if(shop.month_sum) meta.push('月售 '+shop.month_sum);
-  document.getElementById('rmeta').textContent=meta.join(' · ')||' ';
-  document.getElementById('rpick').textContent = dish? ('吃：'+dish) : '';
-  document.getElementById('go').href = H5+'?a='+(shop.appid||TENANT.appid)+'_'+(shop.site||TENANT.site)+'_'+encodeURIComponent(shop.shop_id);
-  document.getElementById('result').style.display='block';
-  histArr.unshift({name:shop.shop_name + (dish?(' · '+dish):''), at:Date.now()});
+function applyPick(lv,item){
+  if(lv===1){
+    picked.cate={ id:item.id, name:item.name };
+    // 换了餐厅，若已选店不属于它则清掉
+    if(picked.shop && String(picked.shop.cate_id)!==String(item.id)) picked.shop=null;
+  }else if(lv===2){
+    picked.shop=item;
+    picked.cate={ id:item.cate_id, name:item.cate_name };
+  }else{
+    picked.dish=item.name;
+  }
+  saveLocal(); renderPicks(); renderTabs(); renderResult();
+  histArr.unshift({ name: labelOf(lv,item), at: Date.now() });
   histArr=histArr.slice(0,12); saveLocal(); renderHist();
 }
 
-/* ---------- 列表 ---------- */
+function labelOf(lv,item){
+  if(lv===1) return '餐厅 · '+item.name;
+  if(lv===2) return '窗口 · '+item.shop_name;
+  return '菜品 · '+item.name;
+}
+
+/* ---------- 顶部选择 + 结果 ---------- */
+function renderPicks(){
+  var box=document.getElementById('picks'), html='';
+  var rows=[[1,'餐厅',picked.cate?picked.cate.name:''],[2,'窗口',picked.shop?picked.shop.shop_name:''],[3,'菜品',picked.dish||'']];
+  rows.forEach(function(r){
+    if(r[2]) html+='<span class="pick"><i>'+r[1]+'</i>'+esc(r[2])+'<span class="x" data-clear="'+r[0]+'">×</span></span>';
+    else html+='<span class="pick none"><i>'+r[1]+'</i>未选</span>';
+  });
+  box.innerHTML=html;
+  Array.prototype.forEach.call(box.querySelectorAll('[data-clear]'),function(el){
+    el.addEventListener('click',function(){
+      var lv=+this.getAttribute('data-clear');
+      if(lv===1){ picked.cate=null; picked.shop=null; }
+      if(lv===2) picked.shop=null;
+      if(lv===3) picked.dish=null;
+      saveLocal(); renderPicks(); renderTabs(); renderResult();
+      renderWheelFor(level);
+    });
+  });
+}
+
+function renderTabs(){
+  Array.prototype.forEach.call(document.querySelectorAll('.tab'),function(t){
+    t.classList.toggle('on', +t.getAttribute('data-lv')===level);
+  });
+  document.getElementById('n1').textContent=cateItems().length;
+  document.getElementById('n2').textContent=shopItems().length;
+  document.getElementById('n3').textContent=dishItems().length;
+  var hint='';
+  if(level===1) hint='转一个餐厅；转完「窗口」「菜品」会自动收窄到这家';
+  if(level===2) hint= picked.cate ? ('只在「'+picked.cate.name+'」里转') : '全部 '+pool().length+' 家一起转';
+  if(level===3) hint= picked.shop ? ('用「'+picked.shop.shop_name+'」的菜品分类转') : '没选店时用默认分类（主食/小吃/饮品/套餐）';
+  document.getElementById('hint').textContent=hint;
+}
+
+function renderResult(){
+  var box=document.getElementById('result');
+  var shop=picked.shop;
+  if(!shop && !picked.cate && !picked.dish){ box.style.display='none'; return; }
+  var name = shop ? shop.shop_name : (picked.cate ? picked.cate.name : '');
+  document.getElementById('rname').textContent = name || '还没选店';
+  var img=document.getElementById('rimg');
+  if(shop && shop.shop_logo){ img.src=shop.shop_logo; img.style.display='block'; } else img.style.display='none';
+  var meta=[];
+  if(picked.cate) meta.push(picked.cate.name);
+  if(shop && shop.score) meta.push('评分 '+shop.score);
+  if(shop && shop.month_sum) meta.push('月售 '+shop.month_sum);
+  document.getElementById('rmeta').textContent=meta.join(' · ')||' ';
+  document.getElementById('rpick').textContent = picked.dish? ('吃：'+picked.dish) : '';
+  var go=document.getElementById('go');
+  if(shop){
+    go.href=H5+'?a='+(shop.appid||TENANT.appid)+'_'+(shop.site||TENANT.site)+'_'+encodeURIComponent(shop.shop_id);
+    go.style.display='inline-block';
+  }else{
+    go.style.display='none';
+  }
+  box.style.display='block';
+}
+
+/* ---------- 列表 / 历史 ---------- */
 function renderList(){
   var q=document.getElementById('q').value.trim().toLowerCase();
-  var arr=shops.filter(function(s){ return !q || String(s.shop_name).toLowerCase().indexOf(q)>=0; });
+  var arr=shops.filter(function(s){ return !q||String(s.shop_name).toLowerCase().indexOf(q)>=0; });
   document.getElementById('cnt').textContent=shops.length+' 家 · 已选 '+pool().length;
   var html='';
   arr.forEach(function(s){
-    var k=key(s), on=!!enabled[k];
-    html += '<div class="row"><div class="rowtop">'+
+    var k=key(s),on=!!enabled[k];
+    html+='<div class="row"><div class="rowtop">'+
       (s.shop_logo?'<img src="'+esc(s.shop_logo)+'" alt="" loading="lazy">':'')+
       '<div class="rinfo"><div class="rn">'+esc(s.shop_name)+'</div>'+
-      '<div class="rm"><i class="cdot" style="display:inline-block;width:7px;height:7px;border-radius:2px;background:'+s.shade+';border:1px solid #cfdcd4"></i>'+
-      esc(s.cate_name||'')+'</div></div>'+
+      '<div class="rm">'+esc(s.cate_name||'')+'</div></div>'+
       '<div class="sw'+(on?' on':'')+'" data-k="'+esc(k)+'"></div></div>'+
       '<div class="dishes">'+
-        (s.dishes||DEFAULT_DISHES).map(function(d){ return '<span class="dtag">'+esc(d)+'</span>'; }).join('')+
-        '<span class="dedit" data-edit="'+esc(k)+'">编辑菜品分类</span>'+
-      '</div></div>';
+      (s.dishes||DEFAULT_DISHES).map(function(d){ return '<span class="dtag">'+esc(d)+'</span>'; }).join('')+
+      '<span class="dedit" data-edit="'+esc(k)+'">编辑菜品分类</span></div></div>';
   });
-  document.getElementById('list').innerHTML=html || '<div class="empty">没有匹配的店</div>';
-
-  Array.prototype.forEach.call(document.querySelectorAll('#list .sw'), function(el){
-    el.addEventListener('click', function(){
+  document.getElementById('list').innerHTML=html||'<div class="empty">没有匹配的店</div>';
+  Array.prototype.forEach.call(document.querySelectorAll('#list .sw'),function(el){
+    el.addEventListener('click',function(){
       var k=this.getAttribute('data-k');
       if(enabled[k]) delete enabled[k]; else enabled[k]=1;
       this.classList.toggle('on'); saveLocal();
       document.getElementById('cnt').textContent=shops.length+' 家 · 已选 '+pool().length;
-      resetFlow();
+      renderTabs(); renderWheelFor(level);
     });
   });
-  Array.prototype.forEach.call(document.querySelectorAll('#list .dedit'), function(el){
-    el.addEventListener('click', function(){
+  Array.prototype.forEach.call(document.querySelectorAll('#list .dedit'),function(el){
+    el.addEventListener('click',function(){
       var k=this.getAttribute('data-edit');
-      var s=shops.filter(function(x){ return key(x)===k; })[0];
-      if(!s) return;
-      var cur=(s.dishes||DEFAULT_DISHES).join('/');
-      var v=prompt('这家店的菜品分类（用 / 分隔）', cur);
+      var s=shops.filter(function(x){ return key(x)===k; })[0]; if(!s) return;
+      var v=prompt('这家店的菜品分类（用 / 分隔）',(s.dishes||DEFAULT_DISHES).join('/'));
       if(v===null) return;
       var arr2=v.split(/[\/,，、\s]+/).filter(Boolean).slice(0,12);
       s.dishes=arr2.length?arr2:DEFAULT_DISHES.slice();
-      saveLocal(); renderList();
+      saveLocal(); renderList(); renderTabs(); renderWheelFor(level);
     });
   });
 }
@@ -484,7 +506,7 @@ function renderHist(){
   histArr.forEach(function(it){
     var d=new Date(it.at);
     var hm=(d.getHours()<10?'0':'')+d.getHours()+':'+(d.getMinutes()<10?'0':'')+d.getMinutes();
-    var nm=it.name.length>12?it.name.slice(0,12)+'…':it.name;
+    var nm=it.name.length>14?it.name.slice(0,14)+'…':it.name;
     h+='<span class="chip"><b>'+esc(nm)+'</b> '+hm+'</span>';
   });
   document.getElementById('hist').innerHTML=h;
@@ -494,50 +516,56 @@ function renderHist(){
 function setSrc(t,bad){ var e=document.getElementById('src'); e.textContent=t;
   e.style.color=bad?'#c0392b':'#8a948d'; }
 
-function renderMode(){
-  document.getElementById('modeBtn').textContent = mode==='three' ? '模式：三级' : '模式：单个转盘';
-  document.getElementById('modeBtn').className = 'tbtn' + (mode==='three'?' on':'');
+function renderAll(){
+  renderPicks(); renderTabs(); renderWheelFor(level); renderList(); renderHist(); renderResult();
 }
 
 function boot(force){
-  renderMode();
-  if(!force && loadLocal()){
+  if(!force&&loadLocal()){
     setSrc('本地缓存 '+shops.length+' 家 · 点「重新拉取」更新');
-    renderList(); renderHist(); renderMode(); resetFlow(); return;
+    renderAll(); return;
   }
   setSrc('正在拉取全部店铺…');
   loadAll().then(function(res){
-    if(!res || !res.shops.length){ setSrc('接口没返回数据，点「重新拉取」', true); return; }
+    if(!res||!res.shops.length){ setSrc('接口没返回数据，点「重新拉取」',true); return; }
     shops=res.shops; cats=res.cats; enabled={};
     shops.forEach(function(s){ enabled[key(s)]=1; });
+    if(picked.shop){ // 店可能已下线
+      var found=shops.filter(function(s){ return key(s)===key(picked.shop); })[0];
+      if(!found) picked.shop=null; else picked.shop=found;
+    }
     saveLocal();
     setSrc('已加载 '+shops.length+' 家 · '+new Date().toTimeString().slice(0,5));
-    renderList(); renderHist(); renderMode(); resetFlow();
+    renderAll();
   });
 }
 
-document.getElementById('hub').addEventListener('click', onSpin);
-document.getElementById('again').addEventListener('click', onSpin);
-document.getElementById('again2').addEventListener('click', onSpin);
-document.getElementById('reset').addEventListener('click', resetFlow);
-document.getElementById('refresh').addEventListener('click', function(){ boot(true); });
-document.getElementById('modeBtn').addEventListener('click', function(){
-  mode = (mode==='three') ? 'shop' : 'three';
-  saveLocal(); renderMode(); resetFlow();
+document.getElementById('hub').addEventListener('click', spinCurrent);
+Array.prototype.forEach.call(document.querySelectorAll('.tab'),function(t){
+  t.addEventListener('click',function(){
+    if(spinning) return;
+    level=+this.getAttribute('data-lv');
+    renderTabs(); renderWheelFor(level);
+  });
 });
-document.getElementById('copybtn').addEventListener('click', function(){
+document.getElementById('refresh').addEventListener('click',function(){ boot(true); });
+document.getElementById('copybtn').addEventListener('click',function(){
   var u=location.href.split('?')[0];
   if(navigator.clipboard){ navigator.clipboard.writeText(u); alert('链接已复制'); }
-  else prompt('复制这个链接', u);
+  else prompt('复制这个链接',u);
 });
-document.getElementById('q').addEventListener('input', renderList);
-document.getElementById('allOn').addEventListener('click', function(){
-  shops.forEach(function(s){ enabled[key(s)]=1; }); saveLocal(); renderList(); resetFlow();
+document.getElementById('clearAll').addEventListener('click',function(){
+  picked={cate:null,shop:null,dish:null}; saveLocal();
+  renderPicks(); renderTabs(); renderResult(); renderWheelFor(level);
 });
-document.getElementById('allOff').addEventListener('click', function(){
-  enabled={}; saveLocal(); renderList(); resetFlow();
+document.getElementById('q').addEventListener('input',renderList);
+document.getElementById('allOn').addEventListener('click',function(){
+  shops.forEach(function(s){ enabled[key(s)]=1; }); saveLocal(); renderList(); renderTabs(); renderWheelFor(level);
 });
-document.getElementById('clr').addEventListener('click', function(){
+document.getElementById('allOff').addEventListener('click',function(){
+  enabled={}; saveLocal(); renderList(); renderTabs(); renderWheelFor(level);
+});
+document.getElementById('clr').addEventListener('click',function(){
   histArr=[]; saveLocal(); renderHist();
 });
 

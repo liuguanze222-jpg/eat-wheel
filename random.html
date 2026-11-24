@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>转盘 · 通用版</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{background:#f4f6f4;color:#1c2620;font-family:PingFang SC,Hiragino Sans GB,Microsoft YaHei,system-ui,sans-serif}
+.wrap{max-width:640px;margin:0 auto;padding:16px 14px 40px}
+h1{font-size:21px;font-weight:600;color:#14231a;letter-spacing:-.02em}
+.sub{font-size:12.5px;color:#6b7670;margin-top:4px;line-height:1.5}
+.src{font-size:11px;color:#8a948d;margin-top:6px}
+
+.stage{position:relative;margin-top:8px}
+.wheelbox{position:relative;width:min(320px,80vw);aspect-ratio:1/1;margin:0 auto}
+#rotor{position:absolute;inset:0;transition:transform 3.4s cubic-bezier(.12,.8,.08,1)}
+.pointer{position:absolute;top:-9px;left:50%;margin-left:-11px;width:22px;height:27px;z-index:3}
+#hub{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:66px;height:66px;border-radius:50%;
+     background:#fff;border:1px solid #dfe5e0;color:#14231a;font-size:19px;font-weight:600;cursor:pointer;
+     z-index:2;box-shadow:0 2px 8px rgba(20,40,28,.10);transition:transform .14s}
+#hub:active{transform:translate(-50%,-50%) scale(.92)}
+#hub:disabled{color:#98a29b}
+.hint{text-align:center;font-size:11px;color:#8a948d;margin-top:8px;line-height:1.6}
+
+.result{margin-top:10px;background:#fff;border:1px solid #e6eae6;border-radius:13px;padding:14px 16px;
+        text-align:center;box-shadow:0 2px 10px rgba(20,40,28,.05);animation:pop .45s cubic-bezier(.34,1.56,.64,1)}
+@keyframes pop{from{opacity:0;transform:translateY(10px) scale(.96)}to{opacity:1;transform:none}}
+.relabel{font-size:11px;color:#17b04b;font-weight:600;letter-spacing:1px}
+.rname{font-size:24px;font-weight:700;color:#14231a;margin-top:6px;line-height:1.3;word-break:break-all}
+.ractions{margin-top:12px;display:flex;gap:8px;justify-content:center}
+.btn{border:1px solid #d5ddd6;background:#fff;color:#2a3a30;font-size:13px;padding:8px 16px;border-radius:8px;cursor:pointer}
+.btn.primary{background:#17b04b;border-color:#17b04b;color:#fff;font-weight:600}
+
+.sec{margin-top:22px;font-size:14.5px;font-weight:600;color:#14231a;display:flex;justify-content:space-between;align-items:baseline}
+.sec .n{font-size:11px;color:#8a948d;font-weight:400}
+textarea{width:100%;min-height:96px;margin-top:9px;border:1px solid #d5ddd6;border-radius:10px;padding:10px;
+         font-size:13px;color:#1c2620;font-family:inherit;line-height:1.6;resize:vertical;background:#fff}
+textarea:focus{outline:none;border-color:#17b04b}
+.row{display:flex;gap:8px;margin-top:9px}
+.row input{flex:1;min-width:0;border:1px solid #d5ddd6;border-radius:9px;padding:9px 10px;font-size:13px;color:#1c2620;background:#fff}
+.row input:focus{outline:none;border-color:#17b04b}
+.btn.sm{font-size:12.5px;padding:0 14px;border-radius:9px}
+
+.items{margin-top:12px;display:flex;flex-wrap:wrap;gap:6px}
+.tag{display:inline-flex;align-items:center;gap:6px;background:#fff;border:1px solid #dfe7e2;border-radius:14px;
+     font-size:12.5px;color:#16241b;padding:5px 8px 5px 11px}
+.tag .x{width:16px;height:16px;line-height:15px;text-align:center;border-radius:50%;background:#f1f5f2;
+        color:#7d8b84;cursor:pointer;font-size:11px}
+.tag .x:active{background:#e6ece8}
+.empty{margin-top:12px;background:#fff;border:1px dashed #d5ddd6;border-radius:12px;padding:20px;
+       text-align:center;color:#8a948d;font-size:12.5px;line-height:1.7}
+
+.hist{margin-top:10px;display:flex;flex-wrap:wrap;gap:6px}
+.chip{background:#fff;border:1px solid #e6eae6;border-radius:11px;font-size:11px;color:#5a6660;padding:4px 10px}
+.chip b{color:#1c2620;font-weight:600}
+.foot{margin-top:26px;text-align:center;font-size:10.5px;color:#a6afa9}
+.link{color:#0f7a35;text-decoration:none;border-bottom:1px dashed #b9dcc6}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>转盘</h1>
+  <div class="sub">自己填选项，转到哪个算哪个 · 数据只存在你手机里</div>
+  <div class="src" id="src"></div>
+
+  <div class="stage">
+    <div class="wheelbox">
+      <div id="rotor"><svg id="svg" width="100%" height="100%" viewBox="0 0 340 340"></svg></div>
+      <svg class="pointer" viewBox="0 0 22 27"><path d="M11 26 1 2h20L11 26Z" fill="#17b04b"/></svg>
+      <button id="hub" type="button">转</button>
+    </div>
+    <div class="hint" id="hint"></div>
+
+    <div class="result" id="result" style="display:none">
+      <div class="relabel">就它了</div>
+      <div class="rname" id="rname"></div>
+      <div class="ractions">
+        <button class="btn primary" id="again">再转一次</button>
+        <button class="btn" id="remove">不要这个</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec">选项 <span class="n" id="cnt">0 个</span></div>
+  <textarea id="paste" placeholder="一行一个，也支持逗号/顿号/空格分隔&#10;例：&#10;食堂&#10;外卖&#10;泡面&#10;不吃了"></textarea>
+  <div class="row">
+    <input id="one" type="text" maxlength="40" placeholder="或者一次加一个">
+    <button class="btn sm" id="add">添加</button>
+    <button class="btn sm" id="import">批量导入</button>
+  </div>
+
+  <div class="items" id="items"></div>
+  <div class="empty" id="empty">还没有选项，上面粘一段就行</div>
+
+  <div class="sec">最近转到 <span class="n" id="clr" style="cursor:pointer;color:#0f7a35">清空</span></div>
+  <div class="hist" id="hist"></div>
+
+  <div class="foot">
+    通用版 · <a class="link" href="./">学校专用版</a>
+  </div>
+</div>
+
+<script>
+var SHADES=['#e6f2ea','#ffffff','#dcefe3','#f4f9f5','#e9f4ec','#fbfdfc','#d5e9dd','#eef7f1','#e1f0e7','#ffffff'];
+var items=[], histArr=[], rotation=0, spinning=false, lastPick='';
+
+function esc(s){return String(s==null?'':s).replace(/[<>&"']/g,function(c){
+  return {'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&#39;'}[c];});}
+function darken(hex,amt){if(!hex||hex[0]!=='#')return hex;var v=parseInt(hex.slice(1),16);
+  var r=Math.max(0,((v>>16)&255)-amt),g=Math.max(0,((v>>8)&255)-amt),b=Math.max(0,(v&255)-amt);
+  return '#'+((1<<24)+(r<<16)+(g<<8)+b).toString(16).slice(1);}
+function trunc(s,n){s=String(s||'').trim();return s.length>n?s.slice(0,n)+'…':s;}
+
+/* ---------- 存储 ---------- */
+function save(){
+  try{ localStorage.setItem('wheel-items',JSON.stringify(items));
+       localStorage.setItem('wheel-hist',JSON.stringify(histArr.slice(0,12))); }catch(e){}
+}
+function load(){
+  try{
+    var a=JSON.parse(localStorage.getItem('wheel-items')||'[]');
+    if(a&&a.length) items=a.filter(function(x){return typeof x==='string'&&x.trim();});
+    var h=JSON.parse(localStorage.getItem('wheel-hist')||'[]');
+    if(h&&h.length) histArr=h;
+  }catch(e){}
+}
+
+/* ---------- 画盘 ---------- */
+var CX=170,CY=170,R=140;
+function polar(r,deg){var rad=(deg-90)*Math.PI/180;return [CX+r*Math.cos(rad),CY+r*Math.sin(rad)];}
+function draw(){
+  var n=items.length,parts=[];
+  parts.push('<circle cx="170" cy="170" r="140" fill="#ffffff" stroke="#e2e7e3"/>');
+  if(!n){
+    parts.push('<text x="170" y="170" text-anchor="middle" dominant-baseline="middle" fill="#a6afa9" font-size="12" font-family="PingFang SC,sans-serif">先加几个选项</text>');
+    document.getElementById('svg').innerHTML=parts.join('');return;
+  }
+  var seg=360/n, showText=n<=26;
+  for(var i=0;i<n;i++){
+    var a0=i*seg,a1=a0+seg,p0=polar(R,a0),p1=polar(R,a1),large=(a1-a0)>180?1:0;
+    var base=SHADES[i%SHADES.length],fill=(i%2)?darken(base,7):base;
+    parts.push('<path d="M170 170 L'+p0[0].toFixed(2)+' '+p0[1].toFixed(2)+' A140 140 0 '+large+
+      ' 1 '+p1[0].toFixed(2)+' '+p1[1].toFixed(2)+' Z" fill="'+fill+'" stroke="#e3ebe6" stroke-width="0.8"/>');
+    if(showText){
+      var mid=a0+seg/2,tp=polar(R*0.66,mid),rot=mid+90;
+      if(rot>90&&rot<270)rot-=180;
+      var fs=n>20?7:(n>12?9:12),keep=n>20?3:(n>12?5:7);
+      parts.push('<text x="'+tp[0].toFixed(1)+'" y="'+tp[1].toFixed(1)+'" text-anchor="middle" '+
+        'dominant-baseline="middle" fill="#1a2e22" font-size="'+fs+'" font-family="PingFang SC,sans-serif" '+
+        'transform="rotate('+rot.toFixed(1)+' '+tp[0].toFixed(1)+' '+tp[1].toFixed(1)+')">'+
+        esc(trunc(items[i],keep))+'</text>');
+    }
+  }
+  parts.push('<circle cx="170" cy="170" r="56" fill="#ffffff" stroke="#eef1ee"/>');
+  document.getElementById('svg').innerHTML=parts.join('');
+}
+
+/* ---------- 转 ---------- */
+function spin(){
+  if(spinning||items.length<2) return;
+  spinning=true;
+  var hub=document.getElementById('hub');hub.disabled=true;hub.textContent='…';
+  document.getElementById('result').style.display='none';
+  var rotor=document.getElementById('rotor');
+  var n=items.length,seg=360/n;
+  var idx=Math.floor(Math.random()*n);
+  var jitter=(Math.random()-0.5)*seg*0.62;
+  var target=(360-((idx+0.5)*seg+jitter)%360+360)%360;
+  var cur=((rotation%360)+360)%360;
+  rotation+=360*3+((target-cur+360)%360);
+  rotor.style.transform='rotate('+rotation+'deg)';
+  var done=false;
+  function fin(){
+    if(done)return;done=true;
+    setTimeout(function(){
+      spinning=false;hub.disabled=false;hub.textContent='转';
+      lastPick=items[idx];
+      document.getElementById('rname').textContent=lastPick;
+      document.getElementById('result').style.display='block';
+      histArr.unshift({name:lastPick,at:Date.now()});
+      histArr=histArr.slice(0,12);save();renderHist();
+    },90);
+  }
+  rotor.addEventListener('transitionend',fin,{once:true});
+  setTimeout(fin,4300);
+}
+
+/* ---------- UI ---------- */
+function renderItems(){
+  var box=document.getElementById('items');
+  box.innerHTML=items.map(function(t,i){
+    return '<span class="tag">'+esc(t)+'<span class="x" data-i="'+i+'">×</span></span>';
+  }).join('');
+  Array.prototype.forEach.call(box.querySelectorAll('.x'),function(el){
+    el.addEventListener('click',function(){
+      var i=+this.getAttribute('data-i');
+      items.splice(i,1);save();renderAll();
+    });
+  });
+  document.getElementById('empty').style.display=items.length?'none':'block';
+  document.getElementById('cnt').textContent=items.length+' 个';
+  document.getElementById('src').textContent=items.length+' 个选项 · 已存本地';
+  var h=document.getElementById('hint');
+  if(items.length<2) h.textContent='至少加 2 个选项才能转';
+  else if(items.length>26) h.textContent=items.length+' 个全在盘上（片多，名字从结果看）';
+  else h.textContent=items.length+' 个选项，等概率';
+}
+function renderHist(){
+  var box=document.getElementById('hist');
+  if(!histArr.length){ box.innerHTML='<span class="chip">还没转过</span>'; return; }
+  box.innerHTML=histArr.map(function(it){
+    var d=new Date(it.at);
+    var hm=(d.getHours()<10?'0':'')+d.getHours()+':'+(d.getMinutes()<10?'0':'')+d.getMinutes();
+    return '<span class="chip"><b>'+esc(trunc(it.name,12))+'</b> '+hm+'</span>';
+  }).join('');
+}
+function renderAll(){ renderItems(); draw(); renderHist(); }
+
+/* ---------- 导入 / 添加 ---------- */
+function addMany(raw){
+  var arr=String(raw||'').split(/[\n\r,，、;；\/|]+/).map(function(s){return s.trim();}).filter(Boolean);
+  var added=0;
+  arr.forEach(function(t){
+    if(t.length>40) t=t.slice(0,40);
+    if(items.indexOf(t)<0){ items.push(t); added++; }
+  });
+  save();renderAll();
+  return added;
+}
+document.getElementById('import').addEventListener('click',function(){
+  var ta=document.getElementById('paste');
+  var n=addMany(ta.value);
+  if(n){ ta.value=''; }
+  else alert('没解析到新选项（可能都加过了）');
+});
+document.getElementById('add').addEventListener('click',function(){
+  var inp=document.getElementById('one');
+  var v=inp.value.trim();
+  if(!v) return;
+  if(items.indexOf(v)>=0){ alert('已经有了'); return; }
+  items.push(v.slice(0,40)); inp.value='';
+  save();renderAll();
+});
+document.getElementById('one').addEventListener('keydown',function(e){
+  if(e.key==='Enter') document.getElementById('add').click();
+});
+document.getElementById('hub').addEventListener('click',spin);
+document.getElementById('again').addEventListener('click',spin);
+document.getElementById('remove').addEventListener('click',function(){
+  if(!lastPick) return;
+  var i=items.indexOf(lastPick);
+  if(i>=0){ items.splice(i,1); save(); }
+  lastPick='';
+  document.getElementById('result').style.display='none';
+  renderAll();
+});
+document.getElementById('clr').addEventListener('click',function(){
+  histArr=[];save();renderHist();
+});
+
+load();renderAll();
+</script>
+</body>
+</html>

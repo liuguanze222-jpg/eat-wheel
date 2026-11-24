@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<title>转盘 · 通用版</title>
+<title>附近吃啥 · 转盘</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 body{background:#f4f6f4;color:#1c2620;font-family:PingFang SC,Hiragino Sans GB,Microsoft YaHei,system-ui,sans-serif}
@@ -12,58 +12,106 @@ h1{font-size:21px;font-weight:600;color:#14231a;letter-spacing:-.02em}
 .sub{font-size:12.5px;color:#6b7670;margin-top:4px;line-height:1.5}
 .src{font-size:11px;color:#8a948d;margin-top:6px}
 
-.stage{position:relative;margin-top:8px}
-.wheelbox{position:relative;width:min(320px,80vw);aspect-ratio:1/1;margin:0 auto}
+.keybox{margin-top:12px;background:#fff;border:1px solid #e6eae6;border-radius:12px;padding:12px}
+.keybox.hide{display:none}
+.keybox p{font-size:12px;color:#5a6660;line-height:1.7}
+.keybox a{color:#0f7a35}
+.keyrow{display:flex;gap:8px;margin-top:8px}
+.keyrow input{flex:1;min-width:0;border:1px solid #d5ddd6;border-radius:9px;padding:9px 10px;font-size:13px}
+.btn{border:1px solid #d5ddd6;background:#fff;color:#2a3a30;font-size:13px;padding:9px 16px;border-radius:9px;cursor:pointer}
+.btn.primary{background:#17b04b;border-color:#17b04b;color:#fff;font-weight:600}
+.btn.sm{font-size:12px;padding:6px 12px;border-radius:8px}
+.btn:disabled{opacity:.5}
+
+.cates{margin-top:12px;display:flex;flex-wrap:wrap;gap:6px}
+.cate{font-size:12.5px;color:#3f4c45;background:#fff;border:1px solid #e2e7e3;border-radius:15px;
+      padding:6px 12px;cursor:pointer}
+.cate.on{border-color:#17b04b;color:#0f7a35;background:#f3fbf6;font-weight:600}
+.cate .n{font-size:10px;color:#98a29b;margin-left:4px}
+.cate.on .n{color:#5aa877}
+
+.pull{margin-top:10px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.status{font-size:11px;color:#8a948d}
+
+.stage{position:relative;margin-top:10px}
+.wheelbox{position:relative;width:min(310px,78vw);aspect-ratio:1/1;margin:0 auto}
 #rotor{position:absolute;inset:0;transition:transform 3.4s cubic-bezier(.12,.8,.08,1)}
 .pointer{position:absolute;top:-9px;left:50%;margin-left:-11px;width:22px;height:27px;z-index:3}
 #hub{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:66px;height:66px;border-radius:50%;
      background:#fff;border:1px solid #dfe5e0;color:#14231a;font-size:19px;font-weight:600;cursor:pointer;
-     z-index:2;box-shadow:0 2px 8px rgba(20,40,28,.10);transition:transform .14s}
+     z-index:2;box-shadow:0 2px 8px rgba(20,40,28,.10)}
 #hub:active{transform:translate(-50%,-50%) scale(.92)}
 #hub:disabled{color:#98a29b}
 .hint{text-align:center;font-size:11px;color:#8a948d;margin-top:8px;line-height:1.6}
 
 .result{margin-top:10px;background:#fff;border:1px solid #e6eae6;border-radius:13px;padding:14px 16px;
-        text-align:center;box-shadow:0 2px 10px rgba(20,40,28,.05);animation:pop .45s cubic-bezier(.34,1.56,.64,1)}
+        box-shadow:0 2px 10px rgba(20,40,28,.05);animation:pop .45s cubic-bezier(.34,1.56,.64,1)}
 @keyframes pop{from{opacity:0;transform:translateY(10px) scale(.96)}to{opacity:1;transform:none}}
-.relabel{font-size:11px;color:#17b04b;font-weight:600;letter-spacing:1px}
-.rname{font-size:24px;font-weight:700;color:#14231a;margin-top:6px;line-height:1.3;word-break:break-all}
-.ractions{margin-top:12px;display:flex;gap:8px;justify-content:center}
-.btn{border:1px solid #d5ddd6;background:#fff;color:#2a3a30;font-size:13px;padding:8px 16px;border-radius:8px;cursor:pointer}
-.btn.primary{background:#17b04b;border-color:#17b04b;color:#fff;font-weight:600}
+.rlabel{font-size:11px;color:#17b04b;font-weight:600;letter-spacing:1px}
+.rname{font-size:20px;font-weight:700;color:#14231a;margin-top:6px;line-height:1.3;word-break:break-all}
+.rmeta{font-size:11.5px;color:#6b7670;margin-top:5px;line-height:1.6}
+.ractions{margin-top:11px;display:flex;gap:8px;flex-wrap:wrap}
 
-.sec{margin-top:22px;font-size:14.5px;font-weight:600;color:#14231a;display:flex;justify-content:space-between;align-items:baseline}
+.sec{margin-top:20px;font-size:14.5px;font-weight:600;color:#14231a;display:flex;justify-content:space-between;align-items:baseline}
 .sec .n{font-size:11px;color:#8a948d;font-weight:400}
-textarea{width:100%;min-height:96px;margin-top:9px;border:1px solid #d5ddd6;border-radius:10px;padding:10px;
-         font-size:13px;color:#1c2620;font-family:inherit;line-height:1.6;resize:vertical;background:#fff}
-textarea:focus{outline:none;border-color:#17b04b}
-.row{display:flex;gap:8px;margin-top:9px}
-.row input{flex:1;min-width:0;border:1px solid #d5ddd6;border-radius:9px;padding:9px 10px;font-size:13px;color:#1c2620;background:#fff}
-.row input:focus{outline:none;border-color:#17b04b}
-.btn.sm{font-size:12.5px;padding:0 14px;border-radius:9px}
+.list{max-height:320px;overflow-y:auto;-webkit-overflow-scrolling:touch;margin-top:8px}
+.row{display:flex;align-items:center;background:#fff;border:1px solid #e6eae6;border-radius:10px;
+     padding:9px 10px;margin-bottom:6px}
+.rinfo{flex:1;min-width:0}
+.rn{font-size:13px;color:#1c2620;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rm{font-size:10px;color:#8a948d;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sw{width:38px;height:22px;border-radius:22px;background:#cfd6d1;position:relative;flex:none
+    ;transition:background .2s;cursor:pointer;margin-left:8px}
+.sw::after{content:'';position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;
+           background:#fff;transition:transform .2s cubic-bezier(.34,1.56,.64,1)}
+.sw.on{background:#17b04b}
+.sw.on::after{transform:translateX(16px)}
 
-.items{margin-top:12px;display:flex;flex-wrap:wrap;gap:6px}
-.tag{display:inline-flex;align-items:center;gap:6px;background:#fff;border:1px solid #dfe7e2;border-radius:14px;
-     font-size:12.5px;color:#16241b;padding:5px 8px 5px 11px}
-.tag .x{width:16px;height:16px;line-height:15px;text-align:center;border-radius:50%;background:#f1f5f2;
-        color:#7d8b84;cursor:pointer;font-size:11px}
-.tag .x:active{background:#e6ece8}
-.empty{margin-top:12px;background:#fff;border:1px dashed #d5ddd6;border-radius:12px;padding:20px;
-       text-align:center;color:#8a948d;font-size:12.5px;line-height:1.7}
-
-.hist{margin-top:10px;display:flex;flex-wrap:wrap;gap:6px}
+.hist{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
 .chip{background:#fff;border:1px solid #e6eae6;border-radius:11px;font-size:11px;color:#5a6660;padding:4px 10px}
 .chip b{color:#1c2620;font-weight:600}
-.foot{margin-top:26px;text-align:center;font-size:10.5px;color:#a6afa9}
-.link{color:#0f7a35;text-decoration:none;border-bottom:1px dashed #b9dcc6}
+.empty{margin-top:10px;background:#fff;border:1px dashed #d5ddd6;border-radius:12px;padding:18px;
+       text-align:center;color:#8a948d;font-size:12.5px;line-height:1.7}
+details{margin-top:14px;background:#fff;border:1px solid #e6eae6;border-radius:12px;overflow:hidden}
+summary{padding:10px 13px;font-size:13px;font-weight:600;cursor:pointer;list-style:none;display:flex;justify-content:space-between}
+summary::-webkit-details-marker{display:none}
+summary::after{content:'▾';color:#a6afa9;font-size:11px}
+details[open] summary::after{content:'▴'}
+.dbody{padding:0 12px 12px}
+textarea{width:100%;min-height:80px;border:1px solid #d5ddd6;border-radius:9px;padding:9px;
+         font-size:12.5px;font-family:inherit;line-height:1.6;resize:vertical}
+.foot{margin-top:24px;text-align:center;font-size:10.5px;color:#a6afa9;line-height:1.8}
+.foot a{color:#0f7a35;text-decoration:none;border-bottom:1px dashed #b9dcc6}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <h1>转盘</h1>
-  <div class="sub">自己填选项，转到哪个算哪个 · 数据只存在你手机里</div>
-  <div class="src" id="src"></div>
+  <h1>附近吃啥</h1>
+  <div class="sub">按你当前位置拉附近真实店铺，选品类，转盘决定</div>
+  <div class="src" id="src">等待定位…</div>
 
+  <!-- 高德 key -->
+  <div class="keybox" id="keybox">
+    <p><b>先填一个高德 key（免费，1 分钟）</b><br>
+       打开 <a href="https://console.amap.com/dev/key/app" target="_blank">console.amap.com/dev/key/app</a>
+       → 创建应用 → 添加 Key → 服务平台选「<b>Web服务</b>」→ 复制 Key 粘下面。<br>
+       个人账号每天 5000 次免费额度，够用很久。</p>
+    <div class="keyrow">
+      <input id="keyInput" type="text" placeholder="粘贴 Web服务 Key" autocomplete="off">
+      <button class="btn primary" id="keySave">保存</button>
+    </div>
+  </div>
+
+  <!-- 品类 -->
+  <div class="cates" id="cates"></div>
+
+  <div class="pull">
+    <button class="btn primary" id="pullBtn">拉取附近店铺</button>
+    <button class="btn sm" id="locBtn">重新定位</button>
+    <span class="status" id="status"></span>
+  </div>
+
+  <!-- 转盘 -->
   <div class="stage">
     <div class="wheelbox">
       <div id="rotor"><svg id="svg" width="100%" height="100%" viewBox="0 0 340 340"></svg></div>
@@ -73,37 +121,56 @@ textarea:focus{outline:none;border-color:#17b04b}
     <div class="hint" id="hint"></div>
 
     <div class="result" id="result" style="display:none">
-      <div class="relabel">就它了</div>
+      <div class="rlabel">就这家</div>
       <div class="rname" id="rname"></div>
+      <div class="rmeta" id="rmeta"></div>
       <div class="ractions">
         <button class="btn primary" id="again">再转一次</button>
-        <button class="btn" id="remove">不要这个</button>
+        <button class="btn" id="navBtn">高德打开</button>
+        <button class="btn" id="delBtn">不要这个</button>
       </div>
     </div>
   </div>
 
-  <div class="sec">选项 <span class="n" id="cnt">0 个</span></div>
-  <textarea id="paste" placeholder="一行一个，也支持逗号/顿号/空格分隔&#10;例：&#10;食堂&#10;外卖&#10;泡面&#10;不吃了"></textarea>
-  <div class="row">
-    <input id="one" type="text" maxlength="40" placeholder="或者一次加一个">
-    <button class="btn sm" id="add">添加</button>
-    <button class="btn sm" id="import">批量导入</button>
-  </div>
-
-  <div class="items" id="items"></div>
-  <div class="empty" id="empty">还没有选项，上面粘一段就行</div>
+  <div class="sec">附近店铺 <span class="n" id="cnt">0 家</span></div>
+  <div class="list" id="list"></div>
+  <div class="empty" id="empty">先填 key → 允许定位 → 选品类 → 点「拉取附近店铺」</div>
 
   <div class="sec">最近转到 <span class="n" id="clr" style="cursor:pointer;color:#0f7a35">清空</span></div>
   <div class="hist" id="hist"></div>
 
+  <details>
+    <summary>手动添加（备用）</summary>
+    <div class="dbody">
+      <textarea id="manual" placeholder="一行一个，也支持逗号分隔"></textarea>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <button class="btn sm" id="manualAdd">加入转盘</button>
+      </div>
+    </div>
+  </details>
+
   <div class="foot">
-    通用版 · <a class="link" href="./">学校专用版</a>
+    数据：高德地图 Web 服务 · 仅存本地<br>
+    <a href="./">学校专用版</a>
   </div>
 </div>
 
 <script>
-var SHADES=['#e6f2ea','#ffffff','#dcefe3','#f4f9f5','#e9f4ec','#fbfdfc','#d5e9dd','#eef7f1','#e1f0e7','#ffffff'];
-var items=[], histArr=[], rotation=0, spinning=false, lastPick='';
+/* ---------- 品类定义 ---------- */
+var CATES=[
+  {key:'tea',   name:'奶茶咖啡', kw:'奶茶', types:'050500|050600|050700'},
+  {key:'fast',  name:'快餐汉堡', kw:'汉堡|快餐|炸鸡', types:'050300'},
+  {key:'noodle',name:'面粉米线', kw:'面|米线|米粉', types:'050100'},
+  {key:'rice',  name:'米饭炒菜', kw:'米饭|盖饭|炒菜|快餐', types:'050100'},
+  {key:'hotpot',name:'火锅烧烤', kw:'火锅|烧烤|烤肉', types:'050100|050400'},
+  {key:'sweet', name:'甜品烘焙', kw:'甜品|蛋糕|面包', types:'050800|050900'},
+  {key:'store', name:'便利店',   kw:'便利店|超市', types:'060200'}
+];
+var RADIUS=2000;
+
+/* ---------- 状态 ---------- */
+var all=[], enabled={}, selCates={}, rotation=0, spinning=false, histArr=[];
+var loc=null, lastPick=null;
 
 function esc(s){return String(s==null?'':s).replace(/[<>&"']/g,function(c){
   return {'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&#39;'}[c];});}
@@ -111,35 +178,105 @@ function darken(hex,amt){if(!hex||hex[0]!=='#')return hex;var v=parseInt(hex.sli
   var r=Math.max(0,((v>>16)&255)-amt),g=Math.max(0,((v>>8)&255)-amt),b=Math.max(0,(v&255)-amt);
   return '#'+((1<<24)+(r<<16)+(g<<8)+b).toString(16).slice(1);}
 function trunc(s,n){s=String(s||'').trim();return s.length>n?s.slice(0,n)+'…':s;}
+function key(o){return o.id;}
+function inSel(o){ return !o.cateKey || o.cateKey==='manual' || selCates[o.cateKey]; }
+function pool(){return all.filter(function(o){return enabled[key(o)] && inSel(o);});}
 
 /* ---------- 存储 ---------- */
 function save(){
-  try{ localStorage.setItem('wheel-items',JSON.stringify(items));
-       localStorage.setItem('wheel-hist',JSON.stringify(histArr.slice(0,12))); }catch(e){}
+  try{
+    localStorage.setItem('ns-shops',JSON.stringify(all));
+    localStorage.setItem('ns-en',JSON.stringify(enabled));
+    localStorage.setItem('ns-hist',JSON.stringify(histArr.slice(0,12)));
+    localStorage.setItem('ns-sel',JSON.stringify(selCates));
+  }catch(e){}
 }
 function load(){
   try{
-    var a=JSON.parse(localStorage.getItem('wheel-items')||'[]');
-    if(a&&a.length) items=a.filter(function(x){return typeof x==='string'&&x.trim();});
-    var h=JSON.parse(localStorage.getItem('wheel-hist')||'[]');
-    if(h&&h.length) histArr=h;
+    all=JSON.parse(localStorage.getItem('ns-shops')||'[]');
+    enabled=JSON.parse(localStorage.getItem('ns-en')||'{}');
+    histArr=JSON.parse(localStorage.getItem('ns-hist')||'[]');
+    selCates=JSON.parse(localStorage.getItem('ns-sel')||'null')||{};
   }catch(e){}
+  all.forEach(function(o){ if(!(key(o) in enabled)) enabled[key(o)]=1; });
+  if(!Object.keys(selCates).length){ CATES.forEach(function(x){ selCates[x.key]=1; }); }
 }
 
-/* ---------- 画盘 ---------- */
+/* ---------- 高德 key ---------- */
+function getKey(){ try{ return localStorage.getItem('amap-key')||''; }catch(e){ return ''; } }
+function setKey(k){ try{ localStorage.setItem('amap-key',k); }catch(e){} }
+function refreshKeyBox(){
+  var has=!!getKey();
+  document.getElementById('keybox').className='keybox'+(has?' hide':'');
+}
+
+/* ---------- JSONP ---------- */
+var cbSeq=0;
+function jsonp(url,params){
+  return new Promise(function(resolve,reject){
+    var name='__amap'+(++cbSeq);
+    var qs=Object.keys(params).map(function(k){
+      return encodeURIComponent(k)+'='+encodeURIComponent(params[k]);
+    }).join('&');
+    var s=document.createElement('script');
+    var t=setTimeout(function(){ cleanup(); reject(new Error('超时')); },12000);
+    function cleanup(){ clearTimeout(t); try{delete window[name];}catch(e){window[name]=undefined;} if(s.parentNode) s.parentNode.removeChild(s); }
+    window[name]=function(d){ cleanup(); resolve(d); };
+    s.onerror=function(){ cleanup(); reject(new Error('网络错误')); };
+    s.src=url+'?'+qs+'&callback='+name;
+    document.body.appendChild(s);
+  });
+}
+
+/* ---------- 定位 ---------- */
+function locate(){
+  return new Promise(function(resolve,reject){
+    if(!navigator.geolocation){ reject(new Error('浏览器不支持定位')); return; }
+    navigator.geolocation.getCurrentPosition(function(p){
+      resolve({lat:p.coords.latitude, lng:p.coords.longitude});
+    }, function(e){ reject(new Error(e.code===1?'定位被拒绝，请在微信/浏览器里允许':'定位失败')); },
+    {enableHighAccuracy:false, timeout:12000, maximumAge:60000});
+  });
+}
+
+/* ---------- 拉附近 POI ---------- */
+function searchCate(c, cfg){
+  var pages=[1,2];
+  return Promise.all(pages.map(function(page){
+    return jsonp('https://restapi.amap.com/v3/place/around',{
+      key:cfg.key, location:loc.lng.toFixed(6)+','+loc.lat.toFixed(6),
+      keywords:c.kw, types:c.types, radius:cfg.radius, offset:25, page:page,
+      sortrule:'distance', extensions:'base'
+    }).then(function(d){
+      if(d.status!=='1') throw new Error(d.info||'接口错误');
+      return d.pois||[];
+    }).catch(function(){ return []; });
+  })).then(function(arr){
+    return [].concat.apply([],arr).map(function(p){
+      return {
+        id:'am_'+p.id, name:p.name||'', addr:(p.address||''),
+        dist:parseInt(p.distance||'0',10), cate:c.name, cateKey:c.key,
+        lng:p.location?parseFloat(p.location.split(',')[0]):null,
+        lat:p.location?parseFloat(p.location.split(',')[1]):null
+      };
+    }).filter(function(o){ return o.name && o.name.length>1; });
+  });
+}
+
+/* ---------- 转盘 ---------- */
 var CX=170,CY=170,R=140;
 function polar(r,deg){var rad=(deg-90)*Math.PI/180;return [CX+r*Math.cos(rad),CY+r*Math.sin(rad)];}
-function draw(){
-  var n=items.length,parts=[];
+function draw(list){
+  var n=list.length,parts=[];
   parts.push('<circle cx="170" cy="170" r="140" fill="#ffffff" stroke="#e2e7e3"/>');
   if(!n){
-    parts.push('<text x="170" y="170" text-anchor="middle" dominant-baseline="middle" fill="#a6afa9" font-size="12" font-family="PingFang SC,sans-serif">先加几个选项</text>');
+    parts.push('<text x="170" y="170" text-anchor="middle" dominant-baseline="middle" fill="#a6afa9" font-size="12" font-family="PingFang SC,sans-serif">还没有店</text>');
     document.getElementById('svg').innerHTML=parts.join('');return;
   }
   var seg=360/n, showText=n<=26;
   for(var i=0;i<n;i++){
     var a0=i*seg,a1=a0+seg,p0=polar(R,a0),p1=polar(R,a1),large=(a1-a0)>180?1:0;
-    var base=SHADES[i%SHADES.length],fill=(i%2)?darken(base,7):base;
+    var base=(i%2)?'#f7fbf8':'#e9f4ee',fill=(i%2)?darken('#e9f4ee',4):base;
     parts.push('<path d="M170 170 L'+p0[0].toFixed(2)+' '+p0[1].toFixed(2)+' A140 140 0 '+large+
       ' 1 '+p1[0].toFixed(2)+' '+p1[1].toFixed(2)+' Z" fill="'+fill+'" stroke="#e3ebe6" stroke-width="0.8"/>');
     if(showText){
@@ -149,36 +286,36 @@ function draw(){
       parts.push('<text x="'+tp[0].toFixed(1)+'" y="'+tp[1].toFixed(1)+'" text-anchor="middle" '+
         'dominant-baseline="middle" fill="#1a2e22" font-size="'+fs+'" font-family="PingFang SC,sans-serif" '+
         'transform="rotate('+rot.toFixed(1)+' '+tp[0].toFixed(1)+' '+tp[1].toFixed(1)+')">'+
-        esc(trunc(items[i],keep))+'</text>');
+        esc(trunc(list[i].name,keep))+'</text>');
     }
   }
   parts.push('<circle cx="170" cy="170" r="56" fill="#ffffff" stroke="#eef1ee"/>');
   document.getElementById('svg').innerHTML=parts.join('');
 }
 
-/* ---------- 转 ---------- */
 function spin(){
-  if(spinning||items.length<2) return;
+  var list=pool();
+  if(spinning||list.length<2){ if(list.length<2) alert('至少选 2 家'); return; }
   spinning=true;
   var hub=document.getElementById('hub');hub.disabled=true;hub.textContent='…';
   document.getElementById('result').style.display='none';
-  var rotor=document.getElementById('rotor');
-  var n=items.length,seg=360/n;
+  draw(list);
+  var n=list.length,seg=360/n;
   var idx=Math.floor(Math.random()*n);
   var jitter=(Math.random()-0.5)*seg*0.62;
   var target=(360-((idx+0.5)*seg+jitter)%360+360)%360;
   var cur=((rotation%360)+360)%360;
   rotation+=360*3+((target-cur+360)%360);
+  var rotor=document.getElementById('rotor');
   rotor.style.transform='rotate('+rotation+'deg)';
   var done=false;
   function fin(){
     if(done)return;done=true;
     setTimeout(function(){
       spinning=false;hub.disabled=false;hub.textContent='转';
-      lastPick=items[idx];
-      document.getElementById('rname').textContent=lastPick;
-      document.getElementById('result').style.display='block';
-      histArr.unshift({name:lastPick,at:Date.now()});
+      lastPick=list[idx];
+      showResult(lastPick);
+      histArr.unshift({name:lastPick.name,at:Date.now()});
       histArr=histArr.slice(0,12);save();renderHist();
     },90);
   }
@@ -186,80 +323,195 @@ function spin(){
   setTimeout(fin,4300);
 }
 
+function showResult(o){
+  document.getElementById('rname').textContent=o.name;
+  var m=[];
+  if(o.cate) m.push(o.cate);
+  if(o.dist) m.push(o.dist+' 米');
+  if(o.addr) m.push(o.addr);
+  document.getElementById('rmeta').textContent=m.join(' · ')||' ';
+  document.getElementById('result').style.display='block';
+}
+
 /* ---------- UI ---------- */
-function renderItems(){
-  var box=document.getElementById('items');
-  box.innerHTML=items.map(function(t,i){
-    return '<span class="tag">'+esc(t)+'<span class="x" data-i="'+i+'">×</span></span>';
-  }).join('');
-  Array.prototype.forEach.call(box.querySelectorAll('.x'),function(el){
+function renderCates(){
+  var counts={};
+  all.forEach(function(o){ var k=o.cateKey||'manual'; counts[k]=(counts[k]||0)+1; });
+  var totalOn=CATES.filter(function(x){return selCates[x.key];}).length;
+  var allOn=totalOn===CATES.length;
+  var html='<span class="cate '+(allOn?'on':'')+'" data-k="__all">全部<span class="n">'+all.length+'</span></span>';
+  CATES.forEach(function(x){
+    html+='<span class="cate '+(selCates[x.key]?'on':'')+'" data-k="'+x.key+'">'+x.name+
+      (counts[x.key]?'<span class="n">'+counts[x.key]+'</span>':'')+'</span>';
+  });
+  var box=document.getElementById('cates');
+  box.innerHTML=html;
+  Array.prototype.forEach.call(box.querySelectorAll('.cate'),function(el){
     el.addEventListener('click',function(){
-      var i=+this.getAttribute('data-i');
-      items.splice(i,1);save();renderAll();
+      var k=this.getAttribute('data-k');
+      if(k==='__all'){
+        var on=!allOn;
+        CATES.forEach(function(x){ if(on) selCates[x.key]=1; else delete selCates[x.key]; });
+      }else{
+        if(selCates[k]) delete selCates[k]; else selCates[k]=1;
+      }
+      save();renderCates();renderList();draw(pool());renderHint();
     });
   });
-  document.getElementById('empty').style.display=items.length?'none':'block';
-  document.getElementById('cnt').textContent=items.length+' 个';
-  document.getElementById('src').textContent=items.length+' 个选项 · 已存本地';
-  var h=document.getElementById('hint');
-  if(items.length<2) h.textContent='至少加 2 个选项才能转';
-  else if(items.length>26) h.textContent=items.length+' 个全在盘上（片多，名字从结果看）';
-  else h.textContent=items.length+' 个选项，等概率';
 }
+
+function renderList(){
+  var arr=all.filter(inSel);
+  document.getElementById('cnt').textContent=all.length+' 家 · 已选 '+pool().length;
+  var html=arr.map(function(o){
+    var on=!!enabled[key(o)];
+    return '<div class="row"><div class="rinfo"><div class="rn">'+esc(o.name)+'</div>'+
+      '<div class="rm">'+esc((o.cate||'手动')+(o.dist?(' · '+o.dist+'米'):'')+(o.addr?(' · '+o.addr):''))+'</div></div>'+
+      '<div class="sw'+(on?' on':'')+'" data-k="'+esc(key(o))+'"></div></div>';
+  }).join('');
+  document.getElementById('list').innerHTML=html;
+  document.getElementById('empty').style.display=all.length?'none':'block';
+  Array.prototype.forEach.call(document.querySelectorAll('#list .sw'),function(el){
+    el.addEventListener('click',function(){
+      var k=this.getAttribute('data-k');
+      if(enabled[k]) delete enabled[k]; else enabled[k]=1;
+      this.classList.toggle('on');save();
+      document.getElementById('cnt').textContent=all.length+' 家 · 已选 '+pool().length;
+      renderHint();draw(pool());
+    });
+  });
+}
+
+function renderHint(){
+  var p=pool();
+  var el=document.getElementById('hint');
+  if(!p.length) el.textContent='先拉取/勾选店铺';
+  else if(p.length>26) el.textContent=p.length+' 家在盘上（片多，结果卡看名字）';
+  else el.textContent=p.length+' 家等概率';
+}
+
 function renderHist(){
   var box=document.getElementById('hist');
   if(!histArr.length){ box.innerHTML='<span class="chip">还没转过</span>'; return; }
   box.innerHTML=histArr.map(function(it){
     var d=new Date(it.at);
     var hm=(d.getHours()<10?'0':'')+d.getHours()+':'+(d.getMinutes()<10?'0':'')+d.getMinutes();
-    return '<span class="chip"><b>'+esc(trunc(it.name,12))+'</b> '+hm+'</span>';
+    return '<span class="chip"><b>'+esc(trunc(it.name,10))+'</b> '+hm+'</span>';
   }).join('');
 }
-function renderAll(){ renderItems(); draw(); renderHist(); }
 
-/* ---------- 导入 / 添加 ---------- */
-function addMany(raw){
-  var arr=String(raw||'').split(/[\n\r,，、;；\/|]+/).map(function(s){return s.trim();}).filter(Boolean);
-  var added=0;
-  arr.forEach(function(t){
-    if(t.length>40) t=t.slice(0,40);
-    if(items.indexOf(t)<0){ items.push(t); added++; }
+function setSrc(t){ document.getElementById('src').textContent=t; }
+function setStatus(t){ document.getElementById('status').textContent=t; }
+
+/* ---------- 主流程 ---------- */
+function needKey(){ if(!getKey()){ alert('先填高德 Web服务 Key'); document.getElementById('keyInput').focus(); return true; } return false; }
+
+function doLocate(){
+  setSrc('正在定位…');
+  return locate().then(function(p){
+    loc=p;
+    setSrc('位置已获取：'+p.lat.toFixed(4)+','+p.lng.toFixed(4));
+    return true;
+  }).catch(function(e){
+    setSrc('定位失败：'+e.message);
+    return false;
   });
-  save();renderAll();
-  return added;
 }
-document.getElementById('import').addEventListener('click',function(){
-  var ta=document.getElementById('paste');
-  var n=addMany(ta.value);
-  if(n){ ta.value=''; }
-  else alert('没解析到新选项（可能都加过了）');
+
+function doPull(){
+  if(needKey()) return;
+  var key_=getKey();
+  if(!loc){ doLocate().then(function(ok){ if(ok) doPull(); }); return; }
+  var targets=CATES.filter(function(c){ return selCates[c.key]; });
+  if(!targets.length){ alert('先选品类'); return; }
+  var btn=document.getElementById('pullBtn'); btn.disabled=true;
+  setStatus('拉取中…');
+  var done=0;
+  Promise.all(targets.map(function(c){
+    return searchCate(c,{key:key_, radius:RADIUS}).then(function(rows){
+      done++; setStatus('已完成 '+done+'/'+targets.length+' 个品类');
+      return rows;
+    });
+  })).then(function(groups){
+    var seen={}, merged=[];
+    groups.forEach(function(rows){
+      rows.forEach(function(o){
+        var k=o.name+'|'+Math.round(o.dist/50);
+        if(!seen[k]){ seen[k]=1; merged.push(o); }
+      });
+    });
+    merged.sort(function(a,b){ return a.dist-b.dist; });
+    if(!merged.length){
+      setStatus('没拉到结果');
+      alert('这个位置附近没搜到，检查：Key 是否 Web服务类型、定位是否允许、品类换一个试试');
+      btn.disabled=false; return;
+    }
+    // 合并进列表
+    var exist={};
+    all.forEach(function(o){ exist[o.id]=1; });
+    merged.forEach(function(o){ if(!exist[o.id]){ all.push(o); enabled[o.id]=1; } });
+    save();renderCates();renderList();draw(pool());renderHint();
+    setStatus('拉到 '+merged.length+' 家');
+    btn.disabled=false;
+  }).catch(function(e){
+    setStatus('失败：'+e.message);
+    btn.disabled=false;
+  });
+}
+
+/* ---------- 事件 ---------- */
+document.getElementById('keySave').addEventListener('click',function(){
+  var v=document.getElementById('keyInput').value.trim();
+  if(v.length<10){ alert('Key 看起来不对'); return; }
+  setKey(v);refreshKeyBox();setSrc('Key 已保存，正在定位…');doLocate();
 });
-document.getElementById('add').addEventListener('click',function(){
-  var inp=document.getElementById('one');
-  var v=inp.value.trim();
-  if(!v) return;
-  if(items.indexOf(v)>=0){ alert('已经有了'); return; }
-  items.push(v.slice(0,40)); inp.value='';
-  save();renderAll();
-});
-document.getElementById('one').addEventListener('keydown',function(e){
-  if(e.key==='Enter') document.getElementById('add').click();
-});
+document.getElementById('locBtn').addEventListener('click',function(){ doLocate(); });
+document.getElementById('pullBtn').addEventListener('click',doPull);
 document.getElementById('hub').addEventListener('click',spin);
 document.getElementById('again').addEventListener('click',spin);
-document.getElementById('remove').addEventListener('click',function(){
+document.getElementById('navBtn').addEventListener('click',function(){
   if(!lastPick) return;
-  var i=items.indexOf(lastPick);
-  if(i>=0){ items.splice(i,1); save(); }
-  lastPick='';
-  document.getElementById('result').style.display='none';
-  renderAll();
+  var u;
+  if(lastPick.lng!=null&&lastPick.lat!=null){
+    u='https://uri.amap.com/marker?position='+lastPick.lng+','+lastPick.lat+'&name='+encodeURIComponent(lastPick.name);
+  }else{
+    u='https://uri.amap.com/search?keyword='+encodeURIComponent(lastPick.name);
+  }
+  window.open(u,'_blank');
 });
-document.getElementById('clr').addEventListener('click',function(){
-  histArr=[];save();renderHist();
+document.getElementById('delBtn').addEventListener('click',function(){
+  if(!lastPick) return;
+  var i=all.findIndex(function(o){return key(o)===key(lastPick);});
+  if(i>=0){ all.splice(i,1); delete enabled[key(lastPick)]; }
+  lastPick=null;
+  document.getElementById('result').style.display='none';
+  save();renderCates();renderList();draw(pool());renderHint();
+});
+document.getElementById('clr').addEventListener('click',function(){ histArr=[];save();renderHist(); });
+document.getElementById('manualAdd').addEventListener('click',function(){
+  var ta=document.getElementById('manual');
+  var arr=ta.value.split(/[\n\r,，、;；]+/).map(function(s){return s.trim();}).filter(Boolean);
+  if(!arr.length) return;
+  var n=0;
+  arr.forEach(function(name){
+    var id='mn_'+name;
+    if(all.some(function(o){return o.id===id;})) return;
+    all.push({id:id,name:name,cate:'手动',cateKey:'manual',dist:0,addr:''});
+    enabled[id]=1; n++;
+  });
+  ta.value='';save();renderCates();renderList();draw(pool());renderHint();
 });
 
-load();renderAll();
+/* ---------- 启动 ---------- */
+load();
+refreshKeyBox();
+renderCates();renderList();renderHist();draw(pool());renderHint();
+if(getKey()){
+  if(all.length) setSrc('本地已有 '+all.length+' 家 · 可重新拉取');
+  else doLocate();
+}else{
+  setSrc('先填高德 Key');
+}
 </script>
 </body>
 </html>
